@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ekko Identity Moodboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Space+Grotesk:wght@500;700&family=Fraunces:opsz,wght@9..144,500;9..144,700&family=DM+Mono:wght@400;500&family=Syne:wght@600;800&family=Instrument+Serif&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg: #0b0b0c; --text: #e9e9ea; --muted: #8b8d93; --line: #232428; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.55 Inter, system-ui, sans-serif; }
+    header { max-width: 1200px; margin: 0 auto; padding: 48px 16px 8px; }
+    header h1 { font: 700 28px "Space Grotesk", sans-serif; margin: 0 0 6px; }
+    header p { color: var(--muted); margin: 0; max-width: 720px; }
+    .grid { max-width: 1200px; margin: 0 auto; padding: 24px 16px 64px; display: grid; gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(520px, 1fr)); }
+    @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } }
+    .world { border-radius: 16px; overflow: hidden; border: 1px solid var(--line); display: flex; flex-direction: column; }
+    .stage { position: relative; height: 300px; }
+    .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+    .mark { position: absolute; left: 24px; bottom: 20px; font-size: 44px; letter-spacing: 0.06em; line-height: 1; }
+    .mark .m { display: inline-block; transform: scaleX(-1); }
+    .mark .ghost { opacity: 0.45; }
+    .body { padding: 20px 24px 24px; display: grid; gap: 12px; }
+    .body h2 { margin: 0; font-size: 20px; }
+    .tag { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.7; }
+    .body p { margin: 0; opacity: 0.85; }
+    .swatches { display: flex; gap: 8px; flex-wrap: wrap; }
+    .sw { display: grid; gap: 4px; font: 11px "IBM Plex Mono", monospace; opacity: 0.9; }
+    .sw i { display: block; width: 64px; height: 36px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.12); }
+    dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; margin: 0; font-size: 13px; }
+    dt { opacity: 0.6; } dd { margin: 0; }
+
+    /* 1. Signal */
+    .signal { background: #06090a; color: #d8f5e4; }
+    .signal .mark { font-family: "IBM Plex Mono", monospace; color: #8dffb8; text-shadow: 0 0 18px rgba(141,255,184,0.45); }
+    .signal h2 { font-family: "IBM Plex Mono", monospace; font-weight: 500; }
+    /* 2. Tape */
+    .tape { background: #15110e; color: #efe4d2; }
+    .tape .mark { font-family: "Syne", sans-serif; font-weight: 800; color: #efe4d2; }
+    .tape h2 { font-family: "Syne", sans-serif; font-weight: 800; }
+    /* 3. Contour */
+    .contour { background: #17131f; color: #f0e2cf; }
+    .contour .mark { font-family: "Fraunces", serif; font-weight: 500; color: #f0d4ae; }
+    .contour h2 { font-family: "Fraunces", serif; font-weight: 500; }
+    /* 4. Pulsar */
+    .pulsar { background: #000; color: #f2f0eb; }
+    .pulsar .mark { font-family: "Instrument Serif", serif; color: #f2f0eb; font-size: 52px; }
+    .pulsar h2 { font-family: "Instrument Serif", serif; font-weight: 400; font-size: 26px; }
+    footer { max-width: 1200px; margin: 0 auto; padding: 0 16px 48px; color: var(--muted); font-size: 13px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Ekko: four candidate worlds</h1>
+    <p>Each world is one idea that sets the mark, the palette, the type and the motion. The mark in every card is the same: EKKO with the first K mirrored, so the two K's sit back to back like a signal going out and its echo coming back.</p>
+  </header>
+
+  <div class="grid">
+    <section class="world signal">
+      <div class="stage"><canvas data-world="signal"></canvas>
+        <div class="mark">E<span class="m">K</span><span class="ghost">K</span>O</div></div>
+      <div class="body">
+        <div class="tag">01 · Signal</div>
+        <h2>The lab instrument</h2>
+        <p>An oscilloscope in a dark room. A loss is a pulse, and the trace shows whether it rings on or dies out. A damped wave is literally the cooldown hypothesis (H1b).</p>
+        <div class="swatches">
+          <div class="sw"><i style="background:#06090a"></i>#06090A</div>
+          <div class="sw"><i style="background:#8dffb8"></i>#8DFFB8</div>
+          <div class="sw"><i style="background:#ffb547"></i>#FFB547</div>
+          <div class="sw"><i style="background:#3b4a44"></i>#3B4A44</div>
+        </div>
+        <dl><dt>Type</dt><dd>IBM Plex Mono throughout</dd>
+            <dt>Motion</dt><dd>Live traces, sonar pings, numbers that tick like readouts</dd>
+            <dt>Feels</dt><dd>Precise, clinical, a little eerie</dd></dl>
+      </div>
+    </section>
+
+    <section class="world tape">
+      <div class="stage"><canvas data-world="tape"></canvas>
+        <div class="mark">E<span class="m">K</span><span class="ghost">K</span>O</div></div>
+      <div class="body">
+        <div class="tag">02 · Tape</div>
+        <h2>The recording studio</h2>
+        <p>Echo as a tape-delay effect, rewind as a real reel. Each game is a sound and its echo repeats quieter after it. Warm, tactile, analog. Unexpected for a data project.</p>
+        <div class="swatches">
+          <div class="sw"><i style="background:#15110e"></i>#15110E</div>
+          <div class="sw"><i style="background:#efe4d2"></i>#EFE4D2</div>
+          <div class="sw"><i style="background:#e0562b"></i>#E0562B</div>
+          <div class="sw"><i style="background:#8a7a64"></i>#8A7A64</div>
+        </div>
+        <dl><dt>Type</dt><dd>Syne (display) + DM Mono (data)</dd>
+            <dt>Motion</dt><dd>Scrolling waveforms with delay copies, VU needles, reel spin on scroll</dd>
+            <dt>Feels</dt><dd>Warm, crafted, retro-premium</dd></dl>
+      </div>
+    </section>
+
+    <section class="world contour">
+      <div class="stage"><canvas data-world="contour"></canvas>
+        <div class="mark">E<span class="m">K</span><span class="ghost">K</span>O</div></div>
+      <div class="body">
+        <div class="tag">03 · Contour</div>
+        <h2>The canyon at dusk</h2>
+        <p>The oldest echo is a voice off a canyon wall. Echoes become topographic contour lines spreading out from each game. It's cartographic, like a survey map of ranked play.</p>
+        <div class="swatches">
+          <div class="sw"><i style="background:#17131f"></i>#17131F</div>
+          <div class="sw"><i style="background:#f0d4ae"></i>#F0D4AE</div>
+          <div class="sw"><i style="background:#d9756b"></i>#D9756B</div>
+          <div class="sw"><i style="background:#5b4e70"></i>#5B4E70</div>
+        </div>
+        <dl><dt>Type</dt><dd>Fraunces (display) + Inter (body)</dd>
+            <dt>Motion</dt><dd>Slowly drifting contours, rings that ripple out from points you hover</dd>
+            <dt>Feels</dt><dd>Warm, editorial, expansive</dd></dl>
+      </div>
+    </section>
+
+    <section class="world pulsar">
+      <div class="stage"><canvas data-world="pulsar"></canvas>
+        <div class="mark">E<span class="m">K</span><span class="ghost">K</span>O</div></div>
+      <div class="body">
+        <div class="tag">04 · Pulsar</div>
+        <h2>The observatory</h2>
+        <p>Astronomers stack repeating signals to find pattern in noise. Here each line is a player's season and the question is whether the bumps are real. Stark black and bone, one hot red for the signal.</p>
+        <div class="swatches">
+          <div class="sw"><i style="background:#000000"></i>#000000</div>
+          <div class="sw"><i style="background:#f2f0eb"></i>#F2F0EB</div>
+          <div class="sw"><i style="background:#ff3b2f"></i>#FF3B2F</div>
+          <div class="sw"><i style="background:#4a4946"></i>#4A4946</div>
+        </div>
+        <dl><dt>Type</dt><dd>Instrument Serif (display) + IBM Plex Mono (data)</dd>
+            <dt>Motion</dt><dd>Stacked ridgelines breathing, a red line that surfaces on scroll</dd>
+            <dt>Feels</dt><dd>Scientific, iconic, high contrast</dd></dl>
+      </div>
+    </section>
+  </div>
+  <footer>Moodboard only. Animations are placeholders for the direction, not final art.</footer>
+
+  <script>
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    function setup(canvas) {
+      const ctx = canvas.getContext("2d");
+      const fit = () => {
+        const r = canvas.getBoundingClientRect(), d = devicePixelRatio || 1;
+        canvas.width = r.width * d; canvas.height = r.height * d;
+        ctx.setTransform(d, 0, 0, d, 0, 0);
+        return [r.width, r.height];
+      };
+      let size = fit();
+      addEventListener("resize", () => { size = fit(); });
+      return { ctx, size: () => size };
+    }
+
+    const worlds = {
+      signal({ ctx, size }) {
+        const pings = [];
+        return (t) => {
+          const [w, h] = size();
+          ctx.fillStyle = "rgba(6,9,10,0.28)"; ctx.fillRect(0, 0, w, h);
+          ctx.strokeStyle = "rgba(141,255,184,0.06)"; ctx.lineWidth = 1;
+          for (let x = 0; x < w; x += 32) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
+          for (let y = 0; y < h; y += 32) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+          // damped oscillation: a loss pulse every ~2.4s that rings and decays
+          const period = 2.4, phase = (t / 1000) % period;
+          ctx.beginPath();
+          for (let x = 0; x <= w; x += 2) {
+            const s = phase - (x / w) * period * 0.9;
+            const amp = s > 0 ? Math.exp(-s * 2.2) * Math.sin(s * 18) * h * 0.22 : 0;
+            const y = h * 0.42 - amp;
+            x ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+          }
+          ctx.strokeStyle = "#8dffb8"; ctx.lineWidth = 2; ctx.shadowColor = "#8dffb8"; ctx.shadowBlur = 12; ctx.stroke(); ctx.shadowBlur = 0;
+          if (phase < 0.02 && (!pings.length || t - pings[pings.length - 1].t > 1000)) pings.push({ t, x: w * 0.8, y: h * 0.3 });
+          for (const p of pings) {
+            const a = (t - p.t) / 1800; if (a > 1) continue;
+            ctx.beginPath(); ctx.arc(p.x, p.y, a * 120, 0, Math.PI * 2);
+            ctx.strokeStyle = `rgba(255,181,71,${1 - a})`; ctx.lineWidth = 1.5; ctx.stroke();
+          }
+        };
+      },
+      tape({ ctx, size }) {
+        return (t) => {
+          const [w, h] = size();
+          ctx.clearRect(0, 0, w, h);
+          const s = t / 1000;
+          // reels
+          for (const [cx, dir] of [[w - 170, 1], [w - 70, 1]]) {
+            ctx.save(); ctx.translate(cx, 78); ctx.rotate(s * 1.4 * dir);
+            ctx.strokeStyle = "#8a7a64"; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.arc(0, 0, 38, 0, Math.PI * 2); ctx.stroke();
+            for (let i = 0; i < 3; i++) { ctx.rotate(Math.PI * 2 / 3); ctx.beginPath(); ctx.arc(0, -20, 9, 0, Math.PI * 2); ctx.stroke(); }
+            ctx.restore();
+          }
+          // waveform plus three delay copies, each fainter and later
+          const base = h * 0.6;
+          for (let k = 3; k >= 0; k--) {
+            ctx.beginPath();
+            for (let x = 0; x <= w; x += 3) {
+              const u = x / w * 14 - s * 2 - k * 0.9;
+              const env = Math.max(0, Math.sin(u * 0.45)) ** 3;
+              const y = base + Math.sin(u * 9) * env * 38 * Math.pow(0.55, k);
+              x ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+            }
+            ctx.strokeStyle = k === 0 ? "#e0562b" : `rgba(239,228,210,${0.5 * Math.pow(0.6, k)})`;
+            ctx.lineWidth = k === 0 ? 2 : 1.5; ctx.stroke();
+          }
+          // VU meter
+          const level = 0.5 + 0.4 * Math.sin(s * 3.1) * Math.sin(s * 1.3);
+          ctx.save(); ctx.translate(90, 120);
+          ctx.strokeStyle = "#8a7a64"; ctx.beginPath(); ctx.arc(0, 0, 60, Math.PI * 1.15, Math.PI * 1.85); ctx.stroke();
+          ctx.rotate(-Math.PI / 2 + (level - 0.5) * 1.6);
+          ctx.strokeStyle = "#efe4d2"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, -56); ctx.stroke();
+          ctx.restore();
+        };
+      },
+      contour({ ctx, size }) {
+        const sources = [[0.25, 0.4, 0], [0.62, 0.55, 1.7], [0.82, 0.28, 3.1]];
+        return (t) => {
+          const [w, h] = size();
+          ctx.clearRect(0, 0, w, h);
+          const s = t / 1000;
+          sources.forEach(([sx, sy, off], i) => {
+            for (let r = 0; r < 14; r++) {
+              const rad = ((r * 22 + (s + off) * 14) % 308);
+              const a = 1 - rad / 308;
+              ctx.beginPath();
+              for (let k = 0; k <= 64; k++) {
+                const th = (k / 64) * Math.PI * 2;
+                const wob = 1 + 0.08 * Math.sin(th * 3 + s * 0.6 + i) + 0.05 * Math.sin(th * 5 - s * 0.4);
+                const x = sx * w + Math.cos(th) * rad * wob, y = sy * h + Math.sin(th) * rad * wob * 0.7;
+                k ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+              }
+              ctx.strokeStyle = i === 1 ? `rgba(217,117,107,${a * 0.8})` : `rgba(240,212,174,${a * 0.55})`;
+              ctx.lineWidth = 1; ctx.stroke();
+            }
+          });
+        };
+      },
+      pulsar({ ctx, size }) {
+        const seeds = Array.from({ length: 22 }, (_, i) => [Math.random() * 10, Math.random() * 10, i]);
+        return (t) => {
+          const [w, h] = size();
+          ctx.clearRect(0, 0, w, h);
+          const s = t / 1000, rows = seeds.length, gap = (h - 40) / rows, left = w * 0.32, right = w - 24;
+          seeds.forEach(([a, b, i]) => {
+            const y0 = 30 + i * gap + gap;
+            ctx.beginPath();
+            for (let x = left; x <= right; x += 3) {
+              const u = (x - left) / (right - left);
+              const centre = Math.exp(-((u - 0.5) ** 2) / 0.02);
+              const n = Math.sin(u * 40 + a + s * 0.8) * 0.5 + Math.sin(u * 87 + b - s * 0.5) * 0.3 + Math.sin(u * 13 + s * 0.3 + i);
+              const y = y0 - Math.max(0, centre * (14 + n * 9) + n * 2.2);
+              x === left ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+            }
+            ctx.lineTo(right, y0 + 2); ctx.lineTo(left, y0 + 2); ctx.closePath();
+            ctx.fillStyle = "#000"; ctx.fill();
+            ctx.strokeStyle = i === 13 ? "#ff3b2f" : "rgba(242,240,235,0.85)"; ctx.lineWidth = i === 13 ? 1.6 : 1; ctx.stroke();
+          });
+        };
+      },
+    };
+
+    const loops = [...document.querySelectorAll("canvas[data-world]")].map((c) => worlds[c.dataset.world](setup(c)));
+    const frame = (t) => { loops.forEach((draw) => draw(t)); if (!reduce) requestAnimationFrame(frame); };
+    requestAnimationFrame(frame);
+  </script>
+</body>
+</html>

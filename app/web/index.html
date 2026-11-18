@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ekko: Is It Tilt, or Is It the Queue?</title>
+  <meta name="description" content="A pre-registered study of ranked League of Legends losing streaks: is it tilt, or is it the matchmaker?">
+  <meta property="og:title" content="Ekko: Is it tilt, or is it the queue?">
+  <meta property="og:description" content="A pre-registered study of ranked losing streaks with real Riot API data.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #151b24;
+      --border: #263040;
+      --text: #e6edf3;
+      --muted: #9aa7b6;
+      --accent: #3ddbd9;
+      --accent-2: #f2b84b;
+    }
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #f7f8fa;
+        --surface: #ffffff;
+        --border: #dde2e8;
+        --text: #12171f;
+        --muted: #556070;
+        --accent: #0b8f8d;
+        --accent-2: #b7791f;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 16px/1.6 Inter, system-ui, sans-serif;
+    }
+    main { max-width: 760px; margin: 0 auto; padding: 72px 16px 48px; }
+    .eyebrow {
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    h1 {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: clamp(36px, 7vw, 60px);
+      line-height: 1.05;
+      margin: 12px 0 20px;
+    }
+    h1 em { color: var(--accent); font-style: normal; }
+    h2 { font-family: "Space Grotesk", sans-serif; font-size: 22px; margin: 56px 0 16px; }
+    .lede { font-size: 19px; color: var(--muted); max-width: 620px; }
+    .status {
+      display: inline-flex; align-items: center; gap: 10px;
+      margin-top: 28px; padding: 8px 14px;
+      border: 1px solid var(--border); border-radius: 999px;
+      background: var(--surface); font-size: 14px; color: var(--muted);
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-2); }
+    .cards { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px;
+    }
+    .card .tag { font-family: "Space Grotesk", sans-serif; color: var(--accent); font-weight: 700; }
+    .card h3 { margin: 6px 0 8px; font-size: 17px; }
+    .card p { margin: 0; color: var(--muted); font-size: 15px; }
+    ul.method { padding-left: 20px; color: var(--muted); }
+    ul.method li { margin-bottom: 8px; }
+    ul.method strong { color: var(--text); font-weight: 600; }
+    a { color: var(--accent); }
+    .links { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
+    .button {
+      display: inline-block; padding: 10px 18px; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--surface);
+      color: var(--text); text-decoration: none; font-weight: 500;
+    }
+    .button:hover { border-color: var(--accent); }
+    footer {
+      max-width: 760px; margin: 0 auto; padding: 24px 16px 48px;
+      border-top: 1px solid var(--border); color: var(--muted); font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="eyebrow">Ekko · ranked League of Legends</div>
+    <h1>Is it <em>tilt</em>, or is it the <em>queue</em>?</h1>
+    <p class="lede">
+      Every ranked player has had the losing streak that felt rigged. Ekko tests both explanations
+      with real match data: did you play worse after losing, or did matchmaking hand you weaker
+      teammates?
+    </p>
+    <div class="status"><span class="dot"></span>Collecting data. Findings coming soon.</div>
+
+    <h2>Three questions</h2>
+    <div class="cards">
+      <div class="card">
+        <div class="tag">Q1</div>
+        <h3>Tilt</h3>
+        <p>After a loss, do players perform worse in their next game than their own usual level?</p>
+      </div>
+      <div class="card">
+        <div class="tag">Q2</div>
+        <h3>Loser's queue</h3>
+        <p>After a streak, are your teammates weaker relative to your opponents than your rank predicts?</p>
+      </div>
+      <div class="card">
+        <div class="tag">Q3</div>
+        <h3>Streaks</h3>
+        <p>Are win and loss streaks actually longer than chance would produce?</p>
+      </div>
+    </div>
+
+    <h2>How it's tested</h2>
+    <ul class="method">
+      <li><strong>Pre-registered.</strong> Hypotheses and methods are committed publicly before any results are looked at.</li>
+      <li><strong>Each player against themselves.</strong> Comparing you to your own baseline means "worse players lose more" can't explain the result.</li>
+      <li><strong>Early-game performance.</strong> Gold lead at 14 minutes, measured before most of a game is decided.</li>
+      <li><strong>Selection handled.</strong> Players who stop after a loss aren't the same as players who keep queueing, and the analysis accounts for it.</li>
+      <li><strong>Null results count.</strong> If loser's queue isn't real, that's the finding.</li>
+    </ul>
+
+    <h2>Follow along</h2>
+    <p>A personal tilt report for your own Riot ID is planned once the study is done.</p>
+    <div class="links">
+      <a class="button" href="https://github.com/nakim12/ekko">Code on GitHub</a>
+      <a class="button" href="https://nakim.me">nakim.me</a>
+    </div>
+  </main>
+  <footer>
+    Ekko isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or
+    anyone officially involved in producing or managing Riot Games properties. Riot Games, and all
+    associated properties are trademarks or registered trademarks of Riot Games, Inc.
+  </footer>
+</body>
+</html>
