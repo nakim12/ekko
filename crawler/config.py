@@ -36,8 +36,9 @@ class Settings:
     riot_api_key: str
     platform: str = "na1"
     region: str = "americas"
-    rate_limit_requests: int = 100
-    rate_limit_window_seconds: float = 120.0
+    # (requests, window seconds) pairs, enforced per routing host. Matches the
+    # X-App-Rate-Limit header format: "20:1,100:120".
+    rate_limits: tuple[tuple[int, float], ...] = ((20, 1.0), (100, 120.0))
     data_dir: Path = Path("data")
     duckdb_path: Path = Path("data/ekko.duckdb")
 
@@ -57,6 +58,15 @@ class Settings:
         return self.data_dir / "raw"
 
 
+def parse_rate_limits(spec: str) -> tuple[tuple[int, float], ...]:
+    """Parse "20:1,100:120" into ((20, 1.0), (100, 120.0))."""
+    limits = []
+    for part in spec.split(","):
+        requests, window = part.strip().split(":")
+        limits.append((int(requests), float(window)))
+    return tuple(limits)
+
+
 def load_settings(env_file: str | os.PathLike[str] | None = ".env") -> Settings:
     if env_file is not None:
         load_dotenv(env_file)
@@ -70,8 +80,7 @@ def load_settings(env_file: str | os.PathLike[str] | None = ".env") -> Settings:
         riot_api_key=api_key,
         platform=os.environ.get("RIOT_PLATFORM", "na1"),
         region=os.environ.get("RIOT_REGION", "americas"),
-        rate_limit_requests=int(os.environ.get("RIOT_RATE_LIMIT_REQUESTS", "100")),
-        rate_limit_window_seconds=float(os.environ.get("RIOT_RATE_LIMIT_WINDOW_SECONDS", "120")),
+        rate_limits=parse_rate_limits(os.environ.get("RIOT_RATE_LIMITS", "20:1,100:120")),
         data_dir=data_dir,
         duckdb_path=Path(os.environ.get("EKKO_DUCKDB_PATH", str(data_dir / "ekko.duckdb"))),
     )
