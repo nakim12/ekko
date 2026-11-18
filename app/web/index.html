@@ -85,6 +85,21 @@
       font: 400 clamp(34px, 4.6vw, 58px)/1.04 "Instrument Serif", serif; letter-spacing: -0.005em;
     }
     h2 em { color: #fff; }
+    /* A drop lands behind each heading as its section arrives: two rings, flattened like the hero's water. */
+    h2 { position: relative; isolation: isolate; }
+    .js .reveal h2::before, .js .reveal h2::after {
+      content: ""; position: absolute; z-index: -1; pointer-events: none;
+      left: -60px; top: 50%; width: 260px; height: 96px; margin-top: -48px;
+      border-radius: 50%; border: 1px solid rgba(220, 228, 239, .75);
+      opacity: 0; transform: scale(.15);
+    }
+    .js .reveal.in h2::before { animation: hring 3.4s .35s ease-out both; }
+    .js .reveal.in h2::after { animation: hring 3.4s .95s ease-out both; }
+    @keyframes hring {
+      0% { opacity: 0; transform: scale(.15); }
+      8% { opacity: .6; }
+      100% { opacity: 0; transform: scale(1.8); }
+    }
     .intro { margin: 20px 0 0; max-width: 54ch; color: var(--muted); font-size: 16px; }
 
     /* Three questions */
@@ -99,6 +114,22 @@
     /* Method */
     .method { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(32px, 6vw, 96px); align-items: start; }
     .method .head { position: sticky; top: 64px; }
+    .steps { position: relative; padding-left: 28px; }
+    .drip { position: absolute; left: 0; top: 0; bottom: 0; width: 1px; background: var(--mist); }
+    .drip i {
+      position: absolute; inset: 0; transform-origin: top; transform: scaleY(var(--p, 0));
+      background: linear-gradient(to bottom, rgba(220, 228, 239, .12), var(--silver));
+    }
+    .drip b {
+      position: absolute; left: -2px; top: calc(var(--p, 0) * 100% - 2px); width: 5px; height: 5px; border-radius: 50%;
+      background: var(--silver); box-shadow: 0 0 12px 2px rgba(220, 228, 239, .35);
+      opacity: var(--tip, 0); transition: opacity .5s;
+    }
+    .js .steps li::before, .js .steps li strong, .js .steps li span { transition: color .7s, opacity .7s; }
+    .js .steps li:not(.lit) strong { opacity: .5; }
+    .js .steps li:not(.lit) span { opacity: .6; }
+    .steps li.lit::before { color: var(--silver); }
+    @media (max-width: 600px) { .steps { padding-left: 18px; } }
     .method ol { list-style: none; margin: 0; padding: 0; counter-reset: m; }
     .method li { counter-increment: m; display: grid; grid-template-columns: 44px 1fr; gap: 8px; padding: 26px 0; border-top: 1px solid var(--mist); }
     .method li:last-child { border-bottom: 1px solid var(--mist); }
@@ -121,9 +152,29 @@
     .row:disabled { cursor: default; }
     .row .label { font: italic 400 26px "Instrument Serif", serif; color: var(--muted); }
     .pips { display: grid; grid-template-columns: repeat(30, minmax(0, 1fr)); gap: clamp(3px, 0.6vw, 7px); }
-    .pip { aspect-ratio: 1; border-radius: 50%; }
+    .pips { position: relative; }
+    .pip { position: relative; aspect-ratio: 1; border-radius: 50%; transition: background-color .5s, box-shadow .5s; }
     .pip.w { background: var(--silver); }
     .pip.l { box-shadow: inset 0 0 0 1.5px #56637a; }
+    /* Deal: results fall in like rain, each with a small ring. Held until the game scrolls into view. */
+    .pip.drop { animation: pipdrop .55s cubic-bezier(.2, .7, .3, 1) calc(var(--i) * 32ms) both; }
+    .pip.drop::after {
+      content: ""; position: absolute; inset: 0; border-radius: 50%; border: 1px solid var(--silver);
+      animation: pipring .9s ease-out calc(var(--i) * 32ms + .3s) both;
+    }
+    .game:not(.live) .pip, .game:not(.live) .pip::after { animation-play-state: paused; }
+    @keyframes pipdrop { from { opacity: 0; transform: translateY(-14px) scale(.5); } to { opacity: 1; transform: none; } }
+    @keyframes pipring { 0% { opacity: 0; } 1% { opacity: .5; transform: scale(1); } 100% { opacity: 0; transform: scale(2.4); } }
+    /* Reveal: a gold wave runs along the real row. */
+    .row.real .pip { transition-delay: calc(var(--i) * 28ms); animation: glint .8s ease-out calc(var(--i) * 28ms) both; }
+    .row.real .pip.l { box-shadow: inset 0 0 0 1.5px rgba(227, 197, 143, .55); }
+    @keyframes glint { 0%, 100% { transform: none; } 35% { transform: scale(1.3); filter: brightness(1.5); } }
+    .streak {
+      position: absolute; height: 1.5px; border-radius: 1px; background: var(--muted);
+      transform: scaleX(0); transform-origin: left; transition: transform .9s cubic-bezier(.3, .7, .3, 1) var(--delay, 0s);
+    }
+    .streak.on { transform: scaleX(1); }
+    .row.real .streak { background: var(--gold); }
     .row .verdict { grid-column: 2; min-height: 0; font-size: 13px; color: var(--muted); opacity: 0; transition: opacity .6s; }
     .row.revealed .verdict { opacity: 1; }
     .row.real { border-color: rgba(227, 197, 143, .55); box-shadow: 0 0 40px -12px rgba(227, 197, 143, .25); }
@@ -133,7 +184,7 @@
     @media (max-width: 600px) {
       .row { grid-template-columns: 1fr; gap: 12px; }
       .row .verdict { grid-column: 1; }
-      .pips { grid-template-columns: repeat(15, minmax(0, 1fr)); }
+      .pips { grid-template-columns: repeat(15, minmax(0, 1fr)); row-gap: 12px; }
     }
     .legend { display: flex; flex-wrap: wrap; gap: 22px; align-items: center; font-size: 13px; color: var(--muted); }
     .legend .pip { width: 10px; display: inline-block; vertical-align: -1px; margin-right: 8px; }
@@ -175,6 +226,8 @@
       .hero .eyebrow, h1, .sub, .cue { animation: none; opacity: 1; }
       .cue i, .status i::after { animation: none; }
       .js .reveal { opacity: 1; transform: none; transition: none; }
+      .js .reveal h2::before, .js .reveal h2::after { display: none; }
+      .row.real .pip { animation: none; transition-delay: 0s; }
     }
   </style>
 </head>
@@ -233,6 +286,8 @@
         <h2>Written down <em>before</em> the data is read.</h2>
         <p class="intro">The hypotheses and the analysis plan are committed publicly before any outcome is looked at, so the answer can't be tuned after the fact.</p>
       </div>
+      <div class="steps">
+      <span class="drip" aria-hidden="true"><i></i><b></b></span>
       <ol>
         <li class="reveal"><div><strong>Each player against themselves.</strong><span>Comparing you to your own baseline means "worse players lose more" can't explain the result.</span></div></li>
         <li class="reveal"><div><strong>Early-game performance.</strong><span>Gold difference at 14 minutes, measured before most of a game is decided.</span></div></li>
@@ -240,6 +295,7 @@
         <li class="reveal"><div><strong>Selection handled.</strong><span>Players who stop after a loss aren't the same as players who keep queueing, and the analysis accounts for it.</span></div></li>
         <li class="reveal"><div><strong>Null results count.</strong><span>If loser's queue isn't real, that's the finding.</span></div></li>
       </ol>
+      </div>
     </section>
 
     <section id="streak">
@@ -575,8 +631,36 @@
     els.forEach((el) => io.observe(el));
   })();
 
+  // How it's tested: a drip line grows with scroll and lights each step as it passes.
+  (() => {
+    const steps = document.querySelector(".steps");
+    const drip = steps.querySelector(".drip");
+    const items = [...steps.querySelectorAll("li")];
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      drip.style.setProperty("--p", 1);
+      items.forEach((li) => li.classList.add("lit"));
+      return;
+    }
+    let queued = false;
+    const update = () => {
+      queued = false;
+      const r = steps.getBoundingClientRect();
+      const p = Math.min(1, Math.max(0, (innerHeight * 0.62 - r.top) / r.height));
+      drip.style.setProperty("--p", p.toFixed(4));
+      drip.style.setProperty("--tip", p > 0 && p < 1 ? 1 : 0);
+      const tip = r.top + p * r.height;
+      items.forEach((li) => li.classList.toggle("lit", li.getBoundingClientRect().top + 30 <= tip));
+    };
+    const queue = () => { if (!queued) { queued = true; requestAnimationFrame(update); } };
+    addEventListener("scroll", queue, { passive: true });
+    addEventListener("resize", queue);
+    update();
+  })();
+
   // Spot the real streak. Each sequence is a real player's last 30 ranked games, oldest first,
   // drawn at random from the Phase 0 sample (W/L only; no identifiers).
+  // A round: the same results rain in sorted (wins, then losses), then both rows rearrange at once,
+  // one into the real order and one into a shuffle, so the motion never gives the answer away.
   (() => {
     const REAL = [
       { tier: "Diamond", seq: "LLWLWWLWWWWWLLLWWWLWLWLWWLWLWL" },
@@ -588,53 +672,119 @@
       { tier: "Diamond", seq: "WWLLWWWLWWWWWLWWWLWWWLLWLWLLLW" },
       { tier: "Silver", seq: "WLLLLWWLLWWLLLWLLLLWWWLLLLWLLL" },
     ];
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
     const game = document.getElementById("game");
     const rows = [...game.querySelectorAll(".row")];
     const result = game.querySelector(".result");
     const tallyEl = game.querySelector(".tally");
     const order = [...REAL.keys()].sort(() => Math.random() - 0.5);
-    let round = 0, realIdx = 0, current = null, right = 0, played = 0;
+    let round = 0, realIdx = 0, current = null, right = 0, played = 0, revealed = false, timers = [], pending = null;
 
-    const shuffle = (s) => {
-      let out;
-      do {
-        const a = s.split("");
-        for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
-        out = a.join("");
-      } while (out === s);
-      return out;
+    const later = (ms, fn) => timers.push(setTimeout(fn, ms));
+    const shuffleArr = (a) => {
+      for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+      return a;
     };
-    const longest = (s, ch) => Math.max(...s.split(ch === "W" ? "L" : "W").map((r) => r.length));
-    const paint = (row, s) => {
-      row.querySelector(".pips").innerHTML = [...s].map((c) => `<span class="pip ${c === "W" ? "w" : "l"}"></span>`).join("");
-      row.setAttribute("aria-label", `Row ${row.dataset.i === "0" ? "A" : "B"}: ${[...s].map((c) => (c === "W" ? "win" : "loss")).join(", ")}`);
+    const shuffled = (s) => { let out; do { out = shuffleArr(s.split("")).join(""); } while (out === s); return out; };
+    const longestRun = (s, ch) => { // [start, length] of the first longest run of ch
+      let best = [0, 0], start = 0;
+      for (let i = 0; i <= s.length; i++) {
+        if (i === s.length || s[i] !== ch) { if (i - start > best[1]) best = [start, i - start]; start = i + 1; }
+      }
+      return best;
+    };
+    const pipsHTML = (s, cls) => [...s].map((c, i) => `<span class="pip ${c === "W" ? "w" : "l"}${cls}" style="--i:${i}"></span>`).join("");
+    const label = (row, s) => row.setAttribute("aria-label",
+      `Row ${row.dataset.i === "0" ? "A" : "B"}: ${[...s].map((c) => (c === "W" ? "win" : "loss")).join(", ")}`);
+
+    // Start animations only once the game is on screen.
+    const whenLive = (fn) => (game.classList.contains("live") ? fn() : (pending = fn));
+    new IntersectionObserver(([e], obs) => {
+      if (!e.isIntersecting) return;
+      game.classList.add("live");
+      obs.disconnect();
+      if (pending) { pending(); pending = null; }
+    }, { threshold: 0.35 }).observe(game);
+
+    const settle = () => {
+      rows.forEach((row) => {
+        const pipsEl = row.querySelector(".pips");
+        const target = row.dataset.seq;
+        const pips = [...pipsEl.querySelectorAll(".pip")];
+        const wPos = shuffleArr([...target].flatMap((c, k) => (c === "W" ? [k] : [])));
+        const lPos = shuffleArr([...target].flatMap((c, k) => (c === "L" ? [k] : [])));
+        const dest = pips.map((p) => (p.classList.contains("w") ? wPos.pop() : lPos.pop()));
+        const slots = pips.map((p) => [p.offsetLeft, p.offsetTop]);
+        pips.forEach((p) => p.classList.remove("drop"));
+        void pipsEl.offsetWidth;
+        pips.forEach((p, j) => {
+          const [x0, y0] = slots[j], [x1, y1] = slots[dest[j]];
+          p.style.transition = `transform 1.1s cubic-bezier(.45, .05, .25, 1) ${(Math.random() * 0.35).toFixed(2)}s`;
+          p.style.transform = `translate(${x1 - x0}px, ${y1 - y0}px)`;
+        });
+      });
+      later(1600, () => rows.forEach((row) => {
+        row.querySelector(".pips").innerHTML = pipsHTML(row.dataset.seq, "");
+        row.disabled = false;
+      }));
     };
 
     const deal = () => {
+      timers.forEach(clearTimeout); timers = [];
       current = REAL[order[round % order.length]];
       round++;
+      revealed = false;
       realIdx = Math.random() < 0.5 ? 0 : 1;
       const seqs = [];
       seqs[realIdx] = current.seq;
-      seqs[1 - realIdx] = shuffle(current.seq);
+      seqs[1 - realIdx] = shuffled(current.seq);
+      result.hidden = true;
+      const wins = [...current.seq].filter((c) => c === "W").length;
+      const sorted = "W".repeat(wins) + "L".repeat(30 - wins);
       rows.forEach((row, i) => {
-        row.disabled = false;
+        row.disabled = !reduce;
         row.classList.remove("revealed", "real");
         row.dataset.seq = seqs[i];
         row.querySelector(".verdict").innerHTML = "";
-        paint(row, seqs[i]);
+        row.querySelector(".pips").innerHTML = reduce ? pipsHTML(seqs[i], "") : pipsHTML(sorted, " drop");
+        label(row, seqs[i]);
       });
-      result.hidden = true;
+      if (!reduce) whenLive(() => later(30 * 32 + 1000, settle));
+    };
+
+    const drawStreak = (row, animate) => {
+      const pipsEl = row.querySelector(".pips");
+      pipsEl.querySelectorAll(".streak").forEach((el) => el.remove());
+      const [start, len] = longestRun(row.dataset.seq, "L");
+      const lines = []; // one segment per visual line, in case the run wraps on narrow screens
+      [...pipsEl.querySelectorAll(".pip")].slice(start, start + len).forEach((p) => {
+        const last = lines[lines.length - 1];
+        if (last && last.top === p.offsetTop) last.end = p;
+        else lines.push({ top: p.offsetTop, start: p, end: p });
+      });
+      lines.forEach((ln, k) => {
+        const el = document.createElement("span");
+        el.className = "streak";
+        el.style.left = `${ln.start.offsetLeft}px`;
+        el.style.width = `${ln.end.offsetLeft + ln.end.offsetWidth - ln.start.offsetLeft}px`;
+        el.style.top = `${ln.top + ln.start.offsetHeight + 5}px`;
+        el.style.setProperty("--delay", `${k * 0.45}s`);
+        pipsEl.append(el);
+        if (animate && !reduce) requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add("on")));
+        else el.classList.add("on");
+      });
     };
 
     const pick = (i) => {
+      if (revealed) return;
+      revealed = true;
       const correct = i === realIdx;
       played++; if (correct) right++;
       rows.forEach((row, j) => {
         row.disabled = true;
         row.classList.add("revealed");
         const s = row.dataset.seq;
-        const streaks = `longest losing streak <b>${longest(s, "L")}</b>, longest winning streak <b>${longest(s, "W")}</b>`;
+        const streaks = `longest losing streak <b>${longestRun(s, "L")[1]}</b> (underlined), longest winning streak <b>${longestRun(s, "W")[1]}</b>`;
         if (j === realIdx) {
           row.classList.add("real");
           row.querySelector(".verdict").innerHTML = `<b>Real.</b> A ${current.tier} player's last 30 ranked games &middot; ${streaks}`;
@@ -642,6 +792,7 @@
           row.querySelector(".verdict").innerHTML = `Shuffled &middot; ${streaks}`;
         }
       });
+      later(reduce ? 0 : 700, () => rows.forEach((row) => drawStreak(row, true)));
       const wins = [...current.seq].filter((c) => c === "W").length;
       result.querySelector("p").innerHTML =
         `<strong>${correct ? "You found it." : "That one was the shuffle."}</strong> ` +
@@ -655,6 +806,7 @@
 
     rows.forEach((row, i) => row.addEventListener("click", () => pick(i)));
     game.querySelector("#again").addEventListener("click", deal);
+    addEventListener("resize", () => { if (revealed) rows.forEach((row) => drawStreak(row, false)); });
     deal();
   })();
   </script>

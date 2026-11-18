@@ -39,5 +39,9 @@ Approved by the owner: the moonlight, the stars, the rain rhythm, rain plus a ra
 
 - Same palette and calm, watery motion: gentle scroll reveals, nothing busy.
 - Sections: the three questions (i/ii/iii, the player / the system / the pattern), how it's tested (sticky heading beside a numbered list), "spot the real streak" (a real player's last 30 ranked games next to the same results shuffled; wins are filled silver dots, losses hollow rings; the real row turns gold on reveal), and follow along (GitHub, nakim.me; LinkedIn to add).
-- The water only animates while the hero is on screen. Sections fade up once as they scroll in.
+- Motion below the hero is water-like and one-time, never looping:
+  - Sections fade up once as they scroll in, and two faint elliptical rings spread from behind each heading (a drop landing).
+  - "How it's tested": a thin drip line grows with scroll beside the steps and lights each step as its tip passes.
+  - Streak game: each round, the same results rain in sorted (wins, then losses), then both rows rearrange at once into the real order and a shuffle, so the motion never reveals the answer. On a pick, a gold wave runs along the real row and a line draws under each row's longest losing streak.
+- The water only animates while the hero is on screen. Everything respects `prefers-reduced-motion`.
 - No Ekko champion art or likeness, no Riot branding, no hourglass imagery (it reads as Zhonya's Hourglass). Riot's legal notice goes in the footer.
