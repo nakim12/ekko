@@ -1,0 +1,36 @@
+# secrets
+.env
+.env.*
+!.env.example
+
+# python
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# data (raw Riot data and local warehouses never get committed)
+data/*
+!data/.gitkeep
+*.duckdb
+*.duckdb.wal
+*.parquet
+
+# dbt
+dbt/target/
+dbt/dbt_packages/
+dbt/logs/
+logs/
+
+# node
+node_modules/
+.next/
+.vercel/
+
+# os / editors
+.DS_Store
+.vscode/
+.idea/

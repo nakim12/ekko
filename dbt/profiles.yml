@@ -1,0 +1,11 @@
+ekko:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: "{{ env_var('EKKO_DUCKDB_PATH', '../data/ekko.duckdb') }}"
+      threads: 4
+    prod:
+      type: duckdb
+      path: "md:ekko"
+      threads: 4

@@ -1,0 +1,20 @@
+version: 2
+
+# Raw Riot API data from the crawler's Parquet landing zone (data/raw/).
+# Exact layout gets fixed in Phase 0 once the field check is done.
+sources:
+  - name: raw
+    description: Immutable raw landing zone written by the crawler.
+    tables:
+      - name: matches
+        description: match-v5 match details, one row per match.
+        config:
+          external_location: "{{ env_var('EKKO_DATA_DIR', '../data') }}/raw/matches/**/*.parquet"
+      - name: timelines
+        description: match-v5 timelines, one row per match.
+        config:
+          external_location: "{{ env_var('EKKO_DATA_DIR', '../data') }}/raw/timelines/**/*.parquet"
+      - name: rank_snapshots
+        description: Daily league-v4 rank snapshot per focal player.
+        config:
+          external_location: "{{ env_var('EKKO_DATA_DIR', '../data') }}/raw/rank_snapshots/**/*.parquet"
