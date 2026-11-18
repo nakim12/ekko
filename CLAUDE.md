@@ -17,12 +17,11 @@ Is it tilt, or is it the queue? A Riot API data platform, a pre-registered causa
 - **Phase 0 done.** 20 players (2 per tier, Iron to Challenger), 1,836 ranked games with timelines, loaded into `data/ekko.duckdb` (`raw.matches`, `raw.timelines`, `raw.phase0_players`). Every field in the data model is present; see `docs/phase0-field-check.md`. Code: `crawler/riot.py` (per-host sliding-window rate limiter, 429/5xx retries), `crawler/phase0.py` (`fetch` / `load` / `check`).
 - Finding to carry forward: some players have far fewer than 100 ranked games (min 11), so the real sampler needs a minimum-games filter.
 - **Personal API key:** the user is applying. Phase 1 (unattended crawler on Fly.io, daily rank snapshot cron) is blocked until it's approved.
-- **Site:** `app/web/hero.html` is the approved hero prototype (moonlit water, see `docs/DESIGN.md`). `app/web/index.html` is still the old placeholder page. `app/web/moodboard.html` is a discarded exploration.
+- **Site:** `app/web/index.html` is the landing page: the approved moonlit-water hero plus questions, method, "spot the real streak" game (8 real 30-game W/L histories from Phase 0, hard-coded) and follow-along links. See `docs/DESIGN.md`. The shooting star repeating every 25-40 s is confirmed. `app/web/moodboard.html` is a discarded exploration. For screenshots, headless Chrome works (`--force-prefers-reduced-motion` renders a still frame with all content visible).
 
 ## Next steps
 
-1. Fold the hero into `index.html` and restyle the rest of the landing page in the same palette and motion language. Remove the `?at=` test hook from the hero before it ships (it renders one frame at a given time for screenshots).
-2. Decide with the user whether the shooting star repeats every 25-40 s (current) or plays once per visit.
-3. Deploy the landing page (plan: ekko.nakim.me on Vercel; needs the user's Vercel login and a DNS record).
-4. Phase 1 crawler once the personal key arrives: stratified sampler with random pages and a minimum-games filter, checkpointed crawl to the Parquet landing zone, Fly.io deployment, daily rank snapshots via GitHub Actions.
-5. Phase 2: dbt staging/intermediate/marts per plan section 6, built on the Phase 0 sample while the crawl runs.
+1. Landing page polish from user feedback (a LinkedIn link is planned but the URL isn't known yet).
+2. Deploy the landing page (plan: ekko.nakim.me on Vercel; needs the user's Vercel login and a DNS record).
+3. Phase 1 crawler once the personal key arrives: stratified sampler with random pages and a minimum-games filter, checkpointed crawl to the Parquet landing zone, Fly.io deployment, daily rank snapshots via GitHub Actions.
+4. Phase 2: dbt staging/intermediate/marts per plan section 6, built on the Phase 0 sample while the crawl runs.

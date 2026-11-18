@@ -6,7 +6,7 @@ Ekko's site is for recruiters first and for the owner's own taste second. Each o
 
 The project asks whether your last game ripples into your next one. The hero shows that literally: a dark, glassy lake under a moon, where drops touch the surface and rings spread, distort the moonlight, and settle back to stillness.
 
-## Hero (`app/web/hero.html`)
+## Hero (top of `app/web/index.html`)
 
 - WebGL fragment shader, no libraries. Analytic ring waves (up to 16 at once) plus a gentle background swell, perspective water plane, Fresnel reflection of the sky.
 - **Moon** upper right, small and soft, with a broken reflection column on the water.
@@ -35,8 +35,9 @@ Approved by the owner: the moonlight, the stars, the rain rhythm, rain plus a ra
 - Headlines: Instrument Serif, with italics for emphasis ("*tilt*", "*queue*").
 - Body and labels: Inter. Eyebrow labels in small uppercase with wide tracking.
 
-## Rest of the page (not built yet)
+## Rest of the page
 
 - Same palette and calm, watery motion: gentle scroll reveals, nothing busy.
-- Planned sections: the three questions, how it's tested, one interactive moment ("spot the real streak": a real win/loss history next to a shuffled one), and links to follow along (GitHub, LinkedIn).
+- Sections: the three questions (i/ii/iii, the player / the system / the pattern), how it's tested (sticky heading beside a numbered list), "spot the real streak" (a real player's last 30 ranked games next to the same results shuffled; wins are filled silver dots, losses hollow rings; the real row turns gold on reveal), and follow along (GitHub, nakim.me; LinkedIn to add).
+- The water only animates while the hero is on screen. Sections fade up once as they scroll in.
 - No Ekko champion art or likeness, no Riot branding, no hourglass imagery (it reads as Zhonya's Hourglass). Riot's legal notice goes in the footer.
