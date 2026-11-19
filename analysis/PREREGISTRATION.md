@@ -187,4 +187,23 @@ strength_gap[i,m] = Σ δ_s · streak_state_s[i,m]          (baseline: streak of
 
 Any change after registration is listed here with its date, what changed and why, in a separate commit. Results from changed analyses are reported next to the registered version, never in place of it.
 
-_None yet._
+### Deviation 1: H1 drops games whose previous game has no score (2026-11-18)
+
+- **Applies to:** H1, H1a–c, the secondary outcomes and the IPW rerun (sections 5 and 5.1).
+- **Registered:** if the previous game has no `gold_diff_14` (under 14 minutes, AFK, or no lane opponent), set the lag to 0 and add a "lag missing" indicator.
+- **Change:** drop those games from the H1 sample instead. Expected cost: about 5% of the sample.
+- **Why:** the code-validation step (section 9) found that filling biases β toward tilt. When the previous game's performance is unmeasured, its result stands in for it. In simulation with a true β = 0, performance persistence of 0.2 between games, 5% missing lags and a per-session form shock, the registered model averaged β̂ = −0.012 to −0.020 SD. That is 2–4 times the expected standard error (0.0054), so it would likely report tilt that isn't there. Dropping the rows brought the bias to +0.001 and recovered a planted β = −0.10 as −0.099.
+- **Checked and not adopted:** a split-panel jackknife for the lagged-outcome (Nickell) bias made no measurable difference at about 120 games per player.
+- **Evidence:** `tests/analysis/test_q1.py`, `python -m ekko_analysis.validate`.
+- **Reporting:** the registered model (`lag="fill"`) is reported alongside.
+
+### Deviation 2: H3 uses a within-block permutation null (2026-11-18)
+
+- **Applies to:** H3 and its sensitivity runs (section 6).
+- **Registered:** simulate each game as a Bernoulli draw with p_t equal to the player's win rate over the 20 surrounding games.
+- **Change:** the null shuffles each player's own results within consecutive blocks of 20 games, 10,000 times. Slow skill drift is kept between blocks, and the null is exactly calibrated when games are independent. The test statistic, per-player p-values, bootstrap and decision rule are unchanged. The registered sensitivity runs map to a whole-sequence shuffle (constant win rate) and 50-game blocks.
+- **Why:** the registered null estimates drift from the same noisy games, so its simulated sequences are streakier than independent play. In simulation, independent sequences averaged z = +0.49 with a 95% CI excluding 0, so H3 would be rejected when it is true. On shuffled Phase 0 sequences it gave +0.55 (CI excluding 0). With the block null:
+  - independent sequences averaged z = −0.04 (SE 0.06), and drifting-skill sequences −0.07;
+  - real streakiness gives a stronger signal: −1.05 vs. −0.45 when the previous result repeats with probability 0.55.
+- **Evidence:** `tests/analysis/test_q3.py`, `python -m ekko_analysis.validate`.
+- **Reporting:** the registered null (`null="drift"`) is reported alongside.
