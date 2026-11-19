@@ -26,3 +26,9 @@ def test_read_jsonl_skips_a_torn_last_line(tmp_path):
         f.write('{"n": 2')  # killed mid-write
     assert list(read_jsonl(path)) == [{"n": 1}]
     assert list(read_jsonl(tmp_path / "absent.jsonl")) == []
+
+
+def test_segments_also_flush_on_size(tmp_path):
+    w = SegmentWriter(tmp_path, "timelines", flush_every=1000, max_bytes=50)
+    w.add("NA1_1", {"x": "a" * 60})  # one large document is enough to flush
+    assert stored_ids(tmp_path, "timelines") == {"NA1_1"}

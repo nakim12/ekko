@@ -41,16 +41,23 @@ class SegmentWriter:
         kind: str,
         flush_every: int = 500,
         clock: Callable[[], datetime] = utc_now,
+        max_bytes: int = 64 * 1024 * 1024,
     ) -> None:
         self.dir = raw_dir / kind
         self.flush_every = flush_every
+        self.max_bytes = (
+            max_bytes  # timelines are ~0.6 MB of JSON each; bound memory, not just rows
+        )
         self._clock = clock
         self._rows: list[tuple[str, str, datetime]] = []
+        self._bytes = 0
         self.written = 0
 
     def add(self, match_id: str, payload: object) -> None:
-        self._rows.append((match_id, json.dumps(payload, separators=(",", ":")), self._clock()))
-        if len(self._rows) >= self.flush_every:
+        text = json.dumps(payload, separators=(",", ":"))
+        self._rows.append((match_id, text, self._clock()))
+        self._bytes += len(text)
+        if len(self._rows) >= self.flush_every or self._bytes >= self.max_bytes:
             self.flush()
 
     def flush(self) -> Path | None:
@@ -70,6 +77,7 @@ class SegmentWriter:
         tmp.rename(path)
         self.written += len(self._rows)
         self._rows.clear()
+        self._bytes = 0
         return path
 
 

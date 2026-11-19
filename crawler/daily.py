@@ -27,7 +27,7 @@ import pyarrow as pa
 
 from crawler.config import RANKED_SOLO_QUEUE_ID, Settings, load_settings
 from crawler.phase1 import control_dir, log
-from crawler.riot import RiotAPIError, RiotClient
+from crawler.riot import RiotAPIError, RiotClient, client_scope
 from crawler.store import RecordWriter, SegmentWriter, read_jsonl, read_records, stored_ids
 
 Q2_TARGET = 10_000
@@ -99,7 +99,10 @@ def focal_players(settings: Settings) -> list[str]:
 
 
 async def snapshots(
-    settings: Settings, concurrency: int = 10, now=lambda: datetime.now(UTC)
+    settings: Settings,
+    concurrency: int = 10,
+    now: Callable[[], datetime] = lambda: datetime.now(UTC),
+    client: RiotClient | None = None,
 ) -> None:
     today = now().date().isoformat()
     done = {
@@ -111,7 +114,7 @@ async def snapshots(
     log(f"snapshots: {len(todo)} players to snapshot today")
     writer = RecordWriter(settings.raw_dir, "rank_snapshots", SNAPSHOT_SCHEMA)
     semaphore = asyncio.Semaphore(concurrency)
-    async with RiotClient(settings) as client:
+    async with client_scope(settings, client) as client:
 
         async def one(puuid: str) -> None:
             async with semaphore:
@@ -242,6 +245,7 @@ async def q2(
     target: int = Q2_TARGET,
     concurrency: int = 5,
     now: Callable[[], datetime] = lambda: datetime.now(UTC),
+    client: RiotClient | None = None,
 ) -> None:
     registry = read_records(settings.raw_dir, "q2_matches", ["match_id", "status"])
     seen = {r["match_id"] for r in registry}
@@ -250,7 +254,7 @@ async def q2(
         log(f"q2: target reached ({qualified} qualified matches)")
         return
 
-    async with RiotClient(settings) as client:
+    async with client_scope(settings, client) as client:
         collector = Q2Collector(settings, client, seed, autofill_rate, now)
         since = int((now() - timedelta(hours=window_hours)).timestamp())
         candidates: set[str] = set()

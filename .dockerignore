@@ -1,0 +1,13 @@
+.git
+.env
+.env.*
+.venv
+data
+dbt
+app
+docs
+tests
+node_modules
+**/__pycache__
+**/*.duckdb
+**/*.parquet

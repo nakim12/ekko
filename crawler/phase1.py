@@ -22,7 +22,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from crawler.config import Settings, load_settings
-from crawler.riot import RiotAPIError, RiotClient
+from crawler.riot import RiotAPIError, RiotClient, client_scope
 from crawler.sampler import Sampler, SampleState
 from crawler.store import SegmentWriter, append_jsonl, read_jsonl, stored_ids
 
@@ -46,7 +46,9 @@ def phase0_puuids(settings: Settings) -> set[str]:
 # --- sample ---
 
 
-async def sample(settings: Settings, per_tier: int, apex: int, seed: int) -> None:
+async def sample(
+    settings: Settings, per_tier: int, apex: int, seed: int, client: RiotClient | None = None
+) -> None:
     root = control_dir(settings)
     config_path = root / "sample_config.json"
     config = {"per_tier": per_tier, "apex": apex, "seed": seed}
@@ -59,7 +61,7 @@ async def sample(settings: Settings, per_tier: int, apex: int, seed: int) -> Non
         config_path.write_text(json.dumps({**config, "started_at": datetime.now(UTC).isoformat()}))
 
     state = SampleState.load(root)
-    async with RiotClient(settings) as client:
+    async with client_scope(settings, client) as client:
         sampler = Sampler(client, state, phase0_puuids(settings), seed)
         await sampler.run(per_tier, apex)
         log(f"sample: {len(state.players)} players, {client.request_count} requests")
@@ -68,7 +70,7 @@ async def sample(settings: Settings, per_tier: int, apex: int, seed: int) -> Non
 # --- match ids ---
 
 
-async def match_ids(settings: Settings, games: int) -> None:
+async def match_ids(settings: Settings, games: int, client: RiotClient | None = None) -> None:
     root = control_dir(settings)
     players = list(read_jsonl(root / "players.jsonl"))
     first = {r["puuid"]: r["ids"] for r in read_jsonl(root / "first_match_ids.jsonl")}
@@ -76,7 +78,7 @@ async def match_ids(settings: Settings, games: int) -> None:
     todo = [p for p in players if p["puuid"] not in done]
     log(f"match-ids: {len(todo)} of {len(players)} players to go")
 
-    async with RiotClient(settings) as client:
+    async with client_scope(settings, client) as client:
         for i, player in enumerate(todo, 1):
             puuid = player["puuid"]
             ids = list(first.get(puuid) or await client.ranked_match_ids(puuid, count=100))
@@ -95,7 +97,9 @@ def wanted_ids(settings: Settings) -> list[str]:
     return sorted(ids)
 
 
-async def fetch(settings: Settings, concurrency: int, max_docs: int | None) -> int:
+async def fetch(
+    settings: Settings, concurrency: int, max_docs: int | None, client: RiotClient | None = None
+) -> int:
     root = control_dir(settings)
     missing_path = root / "missing.jsonl"
     missing = {(r["kind"], r["match_id"]) for r in read_jsonl(missing_path)}
@@ -119,7 +123,7 @@ async def fetch(settings: Settings, concurrency: int, max_docs: int | None) -> i
     started = time.monotonic()
     auth_error: RiotAPIError | None = None
 
-    async with RiotClient(settings) as client:
+    async with client_scope(settings, client) as client:
 
         async def worker() -> None:
             nonlocal done, auth_error

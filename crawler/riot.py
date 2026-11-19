@@ -9,7 +9,8 @@ from __future__ import annotations
 import asyncio
 import time
 from collections import deque
-from collections.abc import Callable
+from collections.abc import AsyncIterator, Callable
+from contextlib import asynccontextmanager
 from typing import Any
 
 import httpx
@@ -156,3 +157,15 @@ class RiotClient:
     async def timeline(self, match_id: str) -> dict | None:
         url = f"{self._settings.regional_base_url}/lol/match/v5/matches/{match_id}/timeline"
         return await self.get(url)
+
+
+@asynccontextmanager
+async def client_scope(
+    settings: Settings, client: RiotClient | None = None
+) -> AsyncIterator[RiotClient]:
+    """Use `client` if given (shared rate limits across jobs), else open and close a new one."""
+    if client is not None:
+        yield client
+    else:
+        async with RiotClient(settings) as own:
+            yield own
