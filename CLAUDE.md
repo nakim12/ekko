@@ -16,6 +16,11 @@ Is it tilt, or is it the queue? A Riot API data platform, a pre-registered causa
 
 - **Phase 0 done.** 20 players (2 per tier, Iron to Challenger), 1,836 ranked games with timelines, loaded into `data/ekko.duckdb` (`raw.matches`, `raw.timelines`, `raw.phase0_players`). Every field in the data model is present; see `docs/phase0-field-check.md`. Code: `crawler/riot.py` (per-host sliding-window rate limiter, 429/5xx retries), `crawler/phase0.py` (`fetch` / `load` / `check`).
 - Finding to carry forward: some players have far fewer than 100 ranked games (min 11), so the real sampler needs a minimum-games filter.
+- **Pre-registration committed** (`analysis/PREREGISTRATION.md`, 2026-11-18, `235ac5f`). It governs over the plan where they differ. Changes go in its Deviations section, in a separate commit; never edit it silently. Implications for Phase 1 and Phase 2:
+  - Sampler: 250 per tier (Iron to Diamond, random divisions/pages) + 250 random Master+; keep players with 30+ ranked solo games (else redraw); last 150 games each; Phase 0 players ineligible.
+  - Q2 is a daily job, not a one-off: for focal players' newest matches, look up all 10 ranks within 24 h of match end, until 10,000 matches qualify. Also fetch 5 prior games of one random non-focal participant (placebo).
+  - H2a (autofill) runs on a random 1,000-match subsample only (needs each participant's previous 20 games).
+  - Every model must be validated on simulated data with a planted effect before it runs on real outcomes.
 - **Personal API key:** the user is applying. Phase 1 (unattended crawler on Fly.io, daily rank snapshot cron) is blocked until it's approved.
 - **Site:** `app/web/index.html` is the landing page: the approved moonlit-water hero plus questions, method, "spot the real streak" game (8 real 30-game W/L histories from Phase 0, hard-coded) and follow-along links. See `docs/DESIGN.md`. The shooting star repeating every 25-40 s is confirmed. `app/web/moodboard.html` is a discarded exploration. For screenshots, headless Chrome works (`--force-prefers-reduced-motion` renders a still frame with all content visible).
 
