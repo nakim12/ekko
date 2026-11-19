@@ -1,8 +1,7 @@
 version: 2
 
-# Raw Riot API data in the `raw` schema of the warehouse. Phase 0 loaded tables there; in Phase 1 the
-# loader exposes the crawler's Parquet landing zone (data/raw/) as views with the same names, so these
-# models don't change.
+# Raw Riot API data in the `raw` schema of the warehouse. `python -m crawler.load` exposes the
+# crawler's Parquet landing zone (data/raw/) as views with these names.
 sources:
   - name: raw
     description: Immutable raw data written by the crawler. Payloads are the API responses, unchanged.
@@ -12,7 +11,8 @@ sources:
       - name: timelines
         description: match-v5 timelines, one row per match (`match_id`, `payload` JSON).
       - name: players
-        identifier: phase0_players
+        identifier: "{{ var('players_table', 'phase0_players') }}"
         description: >
-          Focal players and the league-v4 entry they were sampled from. Phase 0 table for now; the
-          Phase 1 sampler replaces it (Phase 0 players are excluded from confirmatory analysis).
+          Focal players and the league-v4 entry they were sampled from. Phase 0 by default; build with
+          --vars '{players_table: players}' for the Phase 1 sample (Phase 0 players are excluded
+          from confirmatory analysis).
