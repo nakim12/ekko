@@ -97,3 +97,51 @@ def read_jsonl(path: Path) -> Iterator[dict]:
                 yield json.loads(line)
             except json.JSONDecodeError:
                 continue
+
+
+class RecordWriter:
+    """Buffers flat records (dicts) for one table and writes them as Parquet segments under
+    data/raw/<name>/dt=<UTC date>/, like SegmentWriter but with a typed schema."""
+
+    def __init__(
+        self,
+        raw_dir: Path,
+        name: str,
+        schema: pa.Schema,
+        flush_every: int = 500,
+        clock: Callable[[], datetime] = utc_now,
+    ) -> None:
+        self.dir = raw_dir / name
+        self.schema = schema
+        self.flush_every = flush_every
+        self._clock = clock
+        self._rows: list[dict] = []
+        self.written = 0
+
+    def add(self, record: dict) -> None:
+        self._rows.append(record)
+        if len(self._rows) >= self.flush_every:
+            self.flush()
+
+    def flush(self) -> Path | None:
+        if not self._rows:
+            return None
+        now = self._clock()
+        out = self.dir / f"dt={now.date().isoformat()}"
+        out.mkdir(parents=True, exist_ok=True)
+        path = out / f"part-{now.strftime('%H%M%S')}-{uuid.uuid4().hex[:8]}.parquet"
+        table = pa.Table.from_pylist(self._rows, schema=self.schema)
+        tmp = path.with_suffix(".parquet.tmp")
+        pq.write_table(table, tmp, compression="zstd")
+        tmp.rename(path)
+        self.written += len(self._rows)
+        self._rows.clear()
+        return path
+
+
+def read_records(raw_dir: Path, name: str, columns: list[str] | None = None) -> list[dict]:
+    """All records written by RecordWriter for `name` (small control tables only)."""
+    rows: list[dict] = []
+    for path in sorted((raw_dir / name).glob("dt=*/*.parquet")):
+        rows += pq.read_table(path, columns=columns).to_pylist()
+    return rows
