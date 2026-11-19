@@ -24,7 +24,9 @@ def _ordered(df: pd.DataFrame) -> pd.DataFrame:
     return df.sort_values(["player_key", "game_start_at", "match_key"])
 
 
-def shuffled_with_planted_tilt(df: pd.DataFrame, beta: float, rng: np.random.Generator) -> pd.DataFrame:
+def shuffled_with_planted_tilt(
+    df: pd.DataFrame, beta: float, rng: np.random.Generator
+) -> pd.DataFrame:
     """Shuffle gold_diff_14_z within player (missing positions stay missing), add beta after a
     same-session loss, and rebuild the lagged outcome from the new values."""
     d = _ordered(df.loc[~df["remake"].astype(bool)]).copy()
@@ -71,7 +73,8 @@ def main(argv: list[str] | None = None) -> None:
     for beta in (0.0, -0.2):
         for lag in ("drop", "fill"):
             ests = [
-                q1.fit_h1(shuffled_with_planted_tilt(df, beta, rng), lag=lag) for _ in range(args.reps)
+                q1.fit_h1(shuffled_with_planted_tilt(df, beta, rng), lag=lag)
+                for _ in range(args.reps)
             ]
             rows.append({"model": f"H1 lag={lag}", **_summary(ests, beta)})
 
@@ -87,8 +90,8 @@ def main(argv: list[str] | None = None) -> None:
     for null in ("block", "drift"):
         res = q3.fit_h3(shuffled_wins(df, rng), n_sims=2000, n_boot=2000, null=null)
         print(
-            f"  null={null:5s} mean z {res.mean_z:+.3f}  95% CI [{res.ci_low:+.3f}, {res.ci_high:+.3f}]"
-            f"  players {res.n_players}"
+            f"  null={null:5s} mean z {res.mean_z:+.3f}"
+            f"  95% CI [{res.ci_low:+.3f}, {res.ci_high:+.3f}]  players {res.n_players}"
         )
 
 

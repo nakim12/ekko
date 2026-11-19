@@ -9,9 +9,10 @@ The lagged performance control is the previous game's standardized gold differen
 every outcome, since it stands for "how well you played last game".
 
 Missing lag (Deviation 1 in PREREGISTRATION.md): when the previous game has no score (under 14
-minutes, AFK, no lane opponent), the registered model sets the lag to 0 with an indicator. Simulation
-showed that biases b toward "tilt" (the previous result stands in for the unmeasured performance),
-so by default those rows are dropped (`lag="drop"`). `lag="fill"` reproduces the registered model.
+minutes, AFK, no lane opponent), the registered model sets the lag to 0 with an indicator.
+Simulation showed that biases b toward "tilt" (the previous result stands in for the unmeasured
+performance), so by default those rows are dropped (`lag="drop"`). `lag="fill"` reproduces the
+registered model.
 """
 
 from __future__ import annotations

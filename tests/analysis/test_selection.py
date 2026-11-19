@@ -7,7 +7,11 @@ from ekko_analysis.simulate import simulate_player_games
 
 def test_continuation_recovers_planted_difference():
     df = simulate_player_games(
-        n_players=300, games_per_player=100, p_continue_after_win=0.65, p_continue_after_loss=0.5, seed=7
+        n_players=300,
+        games_per_player=100,
+        p_continue_after_win=0.65,
+        p_continue_after_loss=0.5,
+        seed=7,
     )
     res = selection.fit_continuation(df)
     assert abs(res.loss_effect.estimate + 0.15) < 3 * res.loss_effect.se

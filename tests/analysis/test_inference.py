@@ -9,7 +9,9 @@ from ekko_analysis.inference import benjamini_hochberg, holm, joint_wald, linear
 def fit_and_data():
     rng = np.random.default_rng(0)
     n = 4000
-    d = pd.DataFrame({"g": rng.integers(0, 200, n).astype(str), "a": rng.normal(size=n), "b": rng.normal(size=n)})
+    d = pd.DataFrame(
+        {"g": rng.integers(0, 200, n).astype(str), "a": rng.normal(size=n), "b": rng.normal(size=n)}
+    )
     d["y"] = 0.5 * d.a - 0.2 * d.b + rng.normal(size=n)
     return pf.feols("y ~ a + b | g", data=d, vcov={"CRV1": "g"}), d
 

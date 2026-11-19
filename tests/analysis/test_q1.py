@@ -1,4 +1,4 @@
-"""Q1 models recover planted tilt effects and hold their false-positive rate (PREREGISTRATION.md 9)."""
+"""Q1 models recover planted tilt and hold their false-positive rate (PREREGISTRATION.md 9)."""
 
 import numpy as np
 from ekko_analysis import q1
@@ -17,7 +17,9 @@ def test_h1_recovers_planted_effect():
 def test_h1_holds_false_positive_rate_under_null():
     estimates, rejections = [], []
     for seed in range(30):
-        df = simulate_player_games(n_players=150, games_per_player=80, beta=0.0, seed=100 + seed, **REALISTIC)
+        df = simulate_player_games(
+            n_players=150, games_per_player=80, beta=0.0, seed=100 + seed, **REALISTIC
+        )
         est = q1.fit_h1(df)
         estimates.append(est.estimate)
         rejections.append(est.p_value < 0.05)
@@ -29,7 +31,9 @@ def test_registered_fill_lag_is_biased_toward_tilt():
     """Why Deviation 1 exists: with missing lags filled, a true zero effect reads as tilt."""
     fill, drop = [], []
     for seed in range(10):
-        df = simulate_player_games(n_players=300, games_per_player=120, beta=0.0, seed=200 + seed, **REALISTIC)
+        df = simulate_player_games(
+            n_players=300, games_per_player=120, beta=0.0, seed=200 + seed, **REALISTIC
+        )
         fill.append(q1.fit_h1(df, lag="fill").estimate)
         drop.append(q1.fit_h1(df, lag="drop").estimate)
     assert np.mean(fill) < -0.01

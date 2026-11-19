@@ -54,7 +54,9 @@ def _fit(d: pd.DataFrame):
     return pf.feols(f"y ~ {rhs} | {' + '.join(FIXED_EFFECTS)}", data=d, vcov={"CRV1": "player_key"})
 
 
-def fit_h2(df: pd.DataFrame, outcome: str = "strength_gap", bound: float = EQUIVALENCE_BOUND_LP) -> H2Result:
+def fit_h2(
+    df: pd.DataFrame, outcome: str = "strength_gap", bound: float = EQUIVALENCE_BOUND_LP
+) -> H2Result:
     d = _prepare(df, outcome)
     fit = _fit(d)
     kw = dict(n_obs=len(d), n_clusters=d.player_key.nunique())

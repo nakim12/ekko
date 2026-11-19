@@ -6,9 +6,9 @@ sequences. Fewer runs than the null means streakier; z < 0 is the streaky direct
 Null (Deviation 2 in PREREGISTRATION.md):
 - "block" (default): the player's own results shuffled within consecutive blocks of 20 games. This
   keeps slow skill drift between blocks and is exactly calibrated when games are independent.
-- "drift" (registered): Bernoulli draws with p_t = win rate over the 20 surrounding games. Simulation
-  showed this null is streakier than independent play (it estimates drift from the same noisy
-  games), so independent sequences score z ~ +0.5 and H3 would be rejected when it is true.
+- "drift" (registered): Bernoulli draws with p_t = win rate over the 20 surrounding games.
+  Simulation showed this null is streakier than independent play (it estimates drift from the
+  same noisy games), so independent sequences score z ~ +0.5 and H3 would be rejected when true.
 Registered sensitivities map to block_size=None (whole-sequence shuffle, i.e. a constant win rate)
 and block_size=50.
 """
@@ -70,7 +70,9 @@ NULLS = ("block", "drift")
 BLOCK_SIZE = 20
 
 
-def block_permutations(seq: np.ndarray, rng: np.random.Generator, n_sims: int, block_size: int | None):
+def block_permutations(
+    seq: np.ndarray, rng: np.random.Generator, n_sims: int, block_size: int | None
+):
     """n_sims copies of seq, each shuffled within consecutive blocks (None: the whole sequence)."""
     n = len(seq)
     block_id = np.arange(n) // (block_size or n)

@@ -118,7 +118,9 @@ def simulate_player_games(
     df = pd.DataFrame(rows)
     df["lost_prev"] = df["lost_prev"].astype("boolean")
     df["prev_game_won"] = df["prev_game_won"].astype("boolean")
-    df["q1_eligible"] = df["outcome_eligible"] & df["lost_prev"].notna() & df["gold_diff_14_z"].notna()
+    df["q1_eligible"] = (
+        df["outcome_eligible"] & df["lost_prev"].notna() & df["gold_diff_14_z"].notna()
+    )
     return df
 
 

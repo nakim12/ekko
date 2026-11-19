@@ -87,7 +87,9 @@ def fit_continuation(df: pd.DataFrame, gap: float = SESSION_GAP_MINUTES) -> Cont
     )
 
 
-def ipw_weights(df: pd.DataFrame, gap: float = SESSION_GAP_MINUTES, trim: float = 0.01) -> pd.Series:
+def ipw_weights(
+    df: pd.DataFrame, gap: float = SESSION_GAP_MINUTES, trim: float = 0.01
+) -> pd.Series:
     """5.1.2: weights for every game, indexed like `df`: 1 / P(previous game was continued).
 
     P comes from a logistic model with the player's leave-one-out continuation rate standing in
@@ -98,7 +100,9 @@ def ipw_weights(df: pd.DataFrame, gap: float = SESSION_GAP_MINUTES, trim: float 
     by_player = c.groupby("player_key")["continued"]
     total, count = by_player.transform("sum"), by_player.transform("count")
     overall = c["continued"].mean()
-    c["player_rate"] = np.where(count > 1, (total - c["continued"]) / (count - 1).clip(lower=1), overall)
+    c["player_rate"] = np.where(
+        count > 1, (total - c["continued"]) / (count - 1).clip(lower=1), overall
+    )
     model = smf.logit(
         "continued ~ lost + own_perf + own_missing + C(game_num_bucket) + C(hour_local)"
         " + C(iso_day_of_week) + player_rate",

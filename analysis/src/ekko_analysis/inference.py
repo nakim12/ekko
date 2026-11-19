@@ -1,4 +1,4 @@
-"""Shared inference helpers: estimates, linear contrasts, joint Wald tests, multiplicity corrections."""
+"""Inference helpers: estimates, linear contrasts, joint Wald tests, multiplicity corrections."""
 
 from __future__ import annotations
 
@@ -72,7 +72,9 @@ def _estimate(name: str, est: float, se: float, n_obs: int, n_clusters: int, lev
     dof = max(n_clusters - 1, 1)
     crit = stats.t.ppf(0.5 + level / 2, dof)
     p = 2 * stats.t.sf(abs(est / se), dof) if se > 0 else float("nan")
-    return Estimate(name, est, se, est - crit * se, est + crit * se, float(p), n_obs, n_clusters, level)
+    return Estimate(
+        name, est, se, est - crit * se, est + crit * se, float(p), n_obs, n_clusters, level
+    )
 
 
 def joint_wald(fit, names: Sequence[str], *, n_clusters: int) -> WaldTest:

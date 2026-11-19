@@ -39,5 +39,7 @@ def test_h3_detects_streaky_play():
 
 def test_registered_drift_null_rejects_independent_games():
     """Why Deviation 2 exists: the registered null calls independent play anti-streaky."""
-    res = q3.fit_h3(simulate_sequences(300, 120, 0.0, seed=1), n_sims=1000, n_boot=2000, null="drift")
+    res = q3.fit_h3(
+        simulate_sequences(300, 120, 0.0, seed=1), n_sims=1000, n_boot=2000, null="drift"
+    )
     assert res.ci_low > 0.2
