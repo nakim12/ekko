@@ -112,6 +112,12 @@ class RiotClient:
         )
         return await self.get(url, params={"page": page}) or []
 
+    async def ranked_entry_by_puuid(self, puuid: str) -> dict | None:
+        """The player's current RANKED_SOLO_5x5 entry, or None if unranked in solo queue."""
+        url = f"{self._settings.platform_base_url}/lol/league/v4/entries/by-puuid/{puuid}"
+        entries = await self.get(url) or []
+        return next((e for e in entries if e.get("queueType") == RANKED_SOLO_QUEUE_NAME), None)
+
     async def apex_league(self, tier: str) -> list[dict]:
         path = {
             "CHALLENGER": "challengerleagues",
@@ -127,9 +133,21 @@ class RiotClient:
 
     # --- regional routing (americas) ---
 
-    async def ranked_match_ids(self, puuid: str, start: int = 0, count: int = 100) -> list[str]:
+    async def ranked_match_ids(
+        self,
+        puuid: str,
+        start: int = 0,
+        count: int = 100,
+        start_time: int | None = None,
+        end_time: int | None = None,
+    ) -> list[str]:
+        """Ranked solo match IDs, newest first. start_time/end_time are epoch seconds."""
         url = f"{self._settings.regional_base_url}/lol/match/v5/matches/by-puuid/{puuid}/ids"
-        params = {"queue": RANKED_SOLO_QUEUE_ID, "start": start, "count": count}
+        params: dict[str, int] = {"queue": RANKED_SOLO_QUEUE_ID, "start": start, "count": count}
+        if start_time is not None:
+            params["startTime"] = start_time
+        if end_time is not None:
+            params["endTime"] = end_time
         return await self.get(url, params=params) or []
 
     async def match(self, match_id: str) -> dict | None:
