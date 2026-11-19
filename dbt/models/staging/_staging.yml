@@ -1,0 +1,51 @@
+version: 2
+
+models:
+  - name: stg_matches
+    columns:
+      - name: match_id
+        data_tests: [unique, not_null]
+      - name: queue_id
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [420]
+      - name: game_start_at
+        data_tests: [not_null]
+      - name: duration_seconds
+        data_tests: [not_null]
+
+  - name: stg_participants
+    data_tests:
+      - unique_combination:
+          arguments:
+            columns: [match_id, participant_id]
+    columns:
+      - name: puuid
+        data_tests: [not_null]
+      - name: team_id
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [100, 200]
+      - name: team_position
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [TOP, JUNGLE, MIDDLE, BOTTOM, UTILITY]
+
+  - name: stg_timeline_frames
+    data_tests:
+      - unique_combination:
+          arguments:
+            columns: [match_id, frame_index, participant_id]
+
+  - name: stg_players
+    columns:
+      - name: puuid
+        data_tests: [unique, not_null]
+      - name: sampled_tier
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [IRON, BRONZE, SILVER, GOLD, PLATINUM, EMERALD, DIAMOND, MASTER, GRANDMASTER, CHALLENGER]

@@ -3,8 +3,11 @@ ekko:
   outputs:
     dev:
       type: duckdb
-      path: "{{ env_var('EKKO_DUCKDB_PATH', '../data/ekko.duckdb') }}"
-      threads: 4
+      # EKKO_DUCKDB_PATH is relative to the repo root (as the crawler reads it); dbt runs from dbt/.
+      path: "{% set p = env_var('EKKO_DUCKDB_PATH', 'data/ekko.duckdb') %}{{ p if p.startswith('/') else '../' ~ p }}"
+      threads: 2
+      settings:
+        preserve_insertion_order: false
     prod:
       type: duckdb
       path: "md:ekko"

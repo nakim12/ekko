@@ -1,0 +1,22 @@
+version: 2
+
+models:
+  - name: int_matches
+    columns:
+      - name: match_id
+        data_tests: [unique, not_null]
+  - name: int_lane_opponents
+    data_tests:
+      - unique_combination:
+          arguments:
+            columns: [match_id, participant_id]
+  - name: int_player_games
+    data_tests:
+      - unique_combination:
+          arguments:
+            columns: [player_key, match_id]
+  - name: int_sessions
+    data_tests:
+      - unique_combination:
+          arguments:
+            columns: [player_key, match_id]

@@ -9,11 +9,19 @@ macro-paths: ["macros"]
 target-path: "target"
 clean-targets: ["target", "dbt_packages"]
 
+# Definitions fixed by analysis/PREREGISTRATION.md (section 4). Change them only through a logged deviation;
+# the session threshold is also overridden for the registered sensitivity runs (30, 90, 120).
+vars:
+  session_gap_minutes: 60
+  remake_seconds: 300
+  afk_xp_at_14: 1500
+  minute_mark: 14
+
 models:
   ekko:
     staging:
       +materialized: view
     intermediate:
-      +materialized: view
+      +materialized: table
     marts:
       +materialized: table

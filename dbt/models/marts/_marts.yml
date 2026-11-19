@@ -1,0 +1,84 @@
+version: 2
+
+models:
+  - name: fct_player_games
+    description: >
+      One row per focal player per match. Definitions follow analysis/PREREGISTRATION.md; q1_eligible
+      is the H1 analysis sample.
+    data_tests:
+      - unique_combination:
+          arguments:
+            columns: [player_key, match_key]
+    columns:
+      - name: player_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_player')
+                field: player_key
+      - name: match_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_match')
+                field: match_key
+      - name: champion_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_champion')
+                field: champion_key
+      - name: date_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_key
+      - name: role_key
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_role')
+                field: role_key
+      - name: win
+        data_tests: [not_null]
+      - name: tier_group
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [iron_silver, gold_platinum, emerald_plus]
+      - name: streak_state
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [L3+, L2, streak_1, W2, W3+]
+      - name: break_bucket
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [lt_15m, 15_60m, 1_6h, 6_24h, gt_24h]
+
+  - name: dim_player
+    columns:
+      - name: player_key
+        data_tests: [unique, not_null]
+  - name: dim_match
+    columns:
+      - name: match_key
+        data_tests: [unique, not_null]
+  - name: dim_champion
+    columns:
+      - name: champion_key
+        data_tests: [unique, not_null]
+  - name: dim_role
+    columns:
+      - name: role_key
+        data_tests: [unique, not_null]
+  - name: dim_date
+    columns:
+      - name: date_key
+        data_tests: [unique, not_null]
