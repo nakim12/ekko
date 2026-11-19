@@ -22,6 +22,6 @@ Is it tilt, or is it the queue? A Riot API data platform, a pre-registered causa
 ## Next steps
 
 1. Landing page polish from user feedback (a LinkedIn link is planned but the URL isn't known yet).
-2. Deploy the landing page (plan: ekko.nakim.me on Vercel; needs the user's Vercel login and a DNS record).
+2. Deploy (ekko.nakim.me on Vercel; needs the user's Vercel login and a DNS record). Deferred: the user wants to deploy once the app is done and work locally until then, so don't push for it.
 3. Phase 1 crawler once the personal key arrives: stratified sampler with random pages and a minimum-games filter, checkpointed crawl to the Parquet landing zone, Fly.io deployment, daily rank snapshots via GitHub Actions.
 4. Phase 2: dbt staging/intermediate/marts per plan section 6, built on the Phase 0 sample while the crawl runs.
