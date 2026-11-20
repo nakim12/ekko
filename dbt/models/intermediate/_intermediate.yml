@@ -20,3 +20,8 @@ models:
       - unique_combination:
           arguments:
             columns: [player_key, match_id]
+  - name: int_duo_flags
+    data_tests:
+      - unique_combination:
+          arguments:
+            columns: [player_key, match_id]

@@ -111,6 +111,8 @@ def simulate_player_games(
                     if loss_run is None
                     else ("3+" if loss_run >= 3 else str(loss_run)),
                     "outcome_eligible": not short,
+                    "duration_seconds": 600 if short else int(rng.uniform(900, 2400)),
+                    "likely_duo": bool(rng.random() < 0.1),
                 }
             )
             clock += 30
@@ -154,12 +156,17 @@ def simulate_team_strength(
     ladder = rng.uniform(0, 3200, n_matches)
     shift = np.select([state == "W3+", state == "L3+"], [delta / 2, -delta / 2], 0.0)
     af_shift = np.select([state == "W3+", state == "L3+"], [autofill_effect, -autofill_effect], 0.0)
+    gap = 20 * np.sin(ladder / 800) + shift + rng.normal(0, gap_sd, n_matches)
+    won = rng.random(n_matches) < 1 / (1 + np.exp(-gap / 200))
     return pd.DataFrame(
         {
             "player_key": rng.integers(0, n_players, n_matches).astype(str),
             "streak_state": state,
             "focal_ladder_position": ladder,
-            "strength_gap": 20 * np.sin(ladder / 800) + shift + rng.normal(0, gap_sd, n_matches),
+            "strength_gap": gap,
+            "strength_gap_unadjusted": gap + np.where(won, 40.0, -40.0),
+            "won_match": won,
+            "autofill_sample": rng.random(n_matches) < 0.3,
             "autofill_gap": np.round(af_shift + rng.normal(0, 1, n_matches)),
             "hour_local": rng.integers(0, 24, n_matches),
             "iso_day_of_week": rng.integers(1, 8, n_matches),

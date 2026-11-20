@@ -11,7 +11,7 @@ import pandas as pd
 REPO_ROOT = Path(__file__).resolve().parents[3]
 
 PLAYER_GAMES_SQL = """
-select f.*, m.game_start_at, d.iso_day_of_week
+select f.*, m.game_start_at, m.duration_seconds, d.iso_day_of_week
 from main.fct_player_games as f
 join main.dim_match as m using (match_key)
 join main.dim_date as d on d.date_key = f.date_key

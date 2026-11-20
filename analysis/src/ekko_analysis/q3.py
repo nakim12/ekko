@@ -39,6 +39,7 @@ class H3Result:
     ci_high: float
     n_players: int
     share_streaky: float  # players with p < .05 and z < 0; chance level is 2.5%
+    p_value: float  # two-sided bootstrap p for mean z = 0 (for the Holm family)
     per_player: pd.DataFrame
 
 
@@ -137,4 +138,5 @@ def fit_h3(
     boot = rng.choice(z, size=(n_boot, len(z)), replace=True).mean(axis=1)
     lo, hi = np.quantile(boot, [0.025, 0.975])
     streaky = ((per_player["p_value"] < 0.05) & (per_player["z"] < 0)).mean()
-    return H3Result(float(z.mean()), float(lo), float(hi), len(z), float(streaky), per_player)
+    p = min(1.0, 2 * min(float(np.mean(boot <= 0)), float(np.mean(boot >= 0))))
+    return H3Result(float(z.mean()), float(lo), float(hi), len(z), float(streaky), p, per_player)

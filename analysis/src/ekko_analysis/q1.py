@@ -42,7 +42,19 @@ class GroupedResult:
     trend: Estimate | None = None
 
 
-LAG_MODES = ("drop", "fill")
+LAG_MODES = (
+    "drop",
+    "fill",
+    "none",
+)  # "none": no lagged-outcome control (registered robustness run)
+
+
+def _controls(lag: str) -> str:
+    if lag == "none":
+        return "log_break"
+    if lag == "drop":  # no missing lags left, so no indicator
+        return "prev_perf + log_break"
+    return CONTROLS
 
 
 def prepare(df: pd.DataFrame, outcome: str, sample: pd.Series, lag: str = "drop") -> pd.DataFrame:
@@ -78,7 +90,7 @@ def fit_h1(
     """H1: effect of losing the previous same-session game. `weights` names a column (IPW)."""
     d = prepare(df, outcome, _q1_sample(df), lag)
     d["lost"] = d["lost_prev"].astype(int)
-    fit = _fit(d, f"lost + {CONTROLS}", weights=weights)
+    fit = _fit(d, f"lost + {_controls(lag)}", weights=weights)
     return linear_contrast(
         fit, {"lost": 1.0}, name=f"H1 {outcome}", n_obs=len(d), n_clusters=d.player_key.nunique()
     )
@@ -92,7 +104,7 @@ def fit_h1a(df: pd.DataFrame, outcome: str = PRIMARY, lag: str = "drop") -> Grou
     d = prepare(df, outcome, _q1_sample(df), lag)
     for label, col in [("1", "loss_1"), ("2", "loss_2"), ("3+", "loss_3p")]:
         d[col] = (d["session_loss_run"] == label).astype(int)
-    fit = _fit(d, f"loss_1 + loss_2 + loss_3p + {CONTROLS}")
+    fit = _fit(d, f"loss_1 + loss_2 + loss_3p + {_controls(lag)}")
     kw = dict(n_obs=len(d), n_clusters=d.player_key.nunique())
     effects = {
         k: linear_contrast(fit, {c: 1.0}, name=f"H1a losses={k}", **kw)
@@ -114,7 +126,9 @@ def fit_h1b(df: pd.DataFrame, outcome: str = PRIMARY, lag: str = "drop") -> Grou
     inter = {b: f"lost_x_{i}" for i, b in enumerate(BREAK_BUCKETS) if i > 0}
     for b, col in inter.items():
         d[col] = d["lost"] * (d["break_bucket"] == b).astype(int)
-    fit = _fit(d, f"lost + {' + '.join(inter.values())} + {CONTROLS}", extra_fe="break_bucket")
+    fit = _fit(
+        d, f"lost + {' + '.join(inter.values())} + {_controls(lag)}", extra_fe="break_bucket"
+    )
     kw = dict(n_obs=len(d), n_clusters=d.player_key.nunique())
     effects = {BREAK_BUCKETS[0]: linear_contrast(fit, {"lost": 1.0}, name="H1b lt_15m", **kw)}
     for b, col in inter.items():
@@ -131,7 +145,7 @@ def fit_h1c(df: pd.DataFrame, outcome: str = PRIMARY, lag: str = "drop") -> Grou
     inter = {g: f"lost_x_{g}" for g in TIER_GROUPS[1:]}
     for g, col in inter.items():
         d[col] = d["lost"] * (d["tier_group"] == g).astype(int)
-    fit = _fit(d, f"lost + {' + '.join(inter.values())} + {CONTROLS}")
+    fit = _fit(d, f"lost + {' + '.join(inter.values())} + {_controls(lag)}")
     kw = dict(n_obs=len(d), n_clusters=d.player_key.nunique())
     effects = {TIER_GROUPS[0]: linear_contrast(fit, {"lost": 1.0}, name="H1c iron_silver", **kw)}
     for g, col in inter.items():

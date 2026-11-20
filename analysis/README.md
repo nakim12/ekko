@@ -11,7 +11,23 @@
   - `simulate.py`: simulated data with planted effects.
   - `validate.py`: real data structure with shuffled outcomes.
   - `data.py`: loads the dbt marts.
-- `results/`: tables and figures regenerated from one command (once the Phase 1 crawl is complete).
+- `results/`: written by `python -m ekko_analysis.run` (`results.md`, `results.json`, `h3_per_player.csv`, `h1_by_group.png`).
+
+## Results, in one command (Phase 1 only)
+
+```bash
+python -m crawler.load
+(cd dbt && dbt build --profiles-dir . --vars '{phase: 1}')
+# session-threshold sensitivity builds, each into its own warehouse:
+for gap in 30 90 120; do (cd dbt && EKKO_DUCKDB_PATH=$PWD/../data/ekko_gap$gap.duckdb \
+  dbt build --profiles-dir . --vars "{phase: 1, session_gap_minutes: $gap}"); done
+python -m ekko_analysis.run --session-warehouse 30=data/ekko_gap30.duckdb \
+  --session-warehouse 90=data/ekko_gap90.duckdb --session-warehouse 120=data/ekko_gap120.duckdb
+```
+
+The runner refuses anything but a full Phase 1 build: it needs the Q2 mart and at least 1,000 players, so it can't touch Phase 0. It applies Holm to H1–H3 and BH to the secondary family. It reports the registered versions of the two deviated analyses alongside them, plus every section 8 sensitivity run. `tests/analysis/test_run.py` runs it end to end on simulated data.
+
+The session-threshold warehouses need the raw views too. Run `python -m crawler.load` against each path first, or copy the main warehouse file before building.
 
 ## Validation before real outcomes
 

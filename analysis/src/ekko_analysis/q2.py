@@ -49,16 +49,23 @@ def _col(state: str) -> str:
     return "state_" + state.replace("+", "p")
 
 
-def _fit(d: pd.DataFrame):
+def _fit(d: pd.DataFrame, controls: tuple[str, ...] = ()):
     rhs = " + ".join(_col(s) for s in STATES) + " + bs(focal_ladder_position, df=4)"
+    rhs += "".join(f" + {c}" for c in controls)
     return pf.feols(f"y ~ {rhs} | {' + '.join(FIXED_EFFECTS)}", data=d, vcov={"CRV1": "player_key"})
 
 
 def fit_h2(
-    df: pd.DataFrame, outcome: str = "strength_gap", bound: float = EQUIVALENCE_BOUND_LP
+    df: pd.DataFrame,
+    outcome: str = "strength_gap",
+    bound: float = EQUIVALENCE_BOUND_LP,
+    controls: tuple[str, ...] = (),
 ) -> H2Result:
+    """`controls` adds covariates, e.g. ("won_match",) for the registered sensitivity run."""
     d = _prepare(df, outcome)
-    fit = _fit(d)
+    for c in controls:
+        d[c] = d[c].astype(float)
+    fit = _fit(d, controls)
     kw = dict(n_obs=len(d), n_clusters=d.player_key.nunique())
     w = {_col("W3+"): 1.0, _col("L3+"): -1.0}
     delta = linear_contrast(fit, w, name="H2 delta (W3+ - L3+)", **kw)

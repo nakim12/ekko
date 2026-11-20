@@ -18,10 +18,12 @@ with games as (
         z.xp_diff_14_z,
         z.deaths_before_14_z,
         z.perf_index,
+        coalesce(duo.likely_duo, false) as likely_duo,
         not g.is_remake and not g.is_afk and g.has_minute_mark and g.has_lane_opponent as outcome_eligible
     from {{ ref('int_player_games') }} as g
     left join {{ ref('int_sessions') }} as s using (player_key, match_id)
     left join {{ ref('int_performance_scores') }} as z using (player_key, match_id)
+    left join {{ ref('int_duo_flags') }} as duo using (player_key, match_id)
 )
 
 select
@@ -84,6 +86,7 @@ select
     g.prev_match_id is not null and p.gold_diff_14_z is null as prev_outcome_missing,
     -- sample flags
     g.is_afk as afk,
+    g.likely_duo,
     g.has_lane_opponent,
     g.outcome_eligible,
     g.outcome_eligible and g.gold_diff_14_z is not null and g.lost_prev is not null as q1_eligible
