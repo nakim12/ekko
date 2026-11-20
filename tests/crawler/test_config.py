@@ -17,3 +17,8 @@ def test_routing_urls(monkeypatch):
     assert settings.platform_base_url == "https://na1.api.riotgames.com"
     assert settings.regional_base_url == "https://americas.api.riotgames.com"
     assert settings.raw_dir.as_posix() == "data/raw"
+
+
+def test_key_optional_for_jobs_that_do_not_call_the_api(monkeypatch):
+    monkeypatch.delenv("RIOT_API_KEY", raising=False)
+    assert load_settings(env_file=None, require_key=False).riot_api_key == ""

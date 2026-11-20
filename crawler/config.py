@@ -67,12 +67,16 @@ def parse_rate_limits(spec: str) -> tuple[tuple[int, float], ...]:
     return tuple(limits)
 
 
-def load_settings(env_file: str | os.PathLike[str] | None = ".env") -> Settings:
+def load_settings(
+    env_file: str | os.PathLike[str] | None = ".env", require_key: bool = True
+) -> Settings:
+    """Settings from the environment (and .env). Jobs that never call the API, like the loader,
+    pass require_key=False."""
     if env_file is not None:
         load_dotenv(env_file)
 
     api_key = os.environ.get("RIOT_API_KEY", "").strip()
-    if not api_key:
+    if not api_key and require_key:
         raise RuntimeError("RIOT_API_KEY is not set; copy .env.example to .env and fill it in")
 
     data_dir = Path(os.environ.get("EKKO_DATA_DIR", "data"))

@@ -29,7 +29,8 @@ python -m crawler.phase1 status
 python -m crawler.daily snapshots    # once a day
 python -m crawler.daily q2           # every 6 hours, until 10,000 matches qualify
 python -m crawler.supervisor         # all of the above in one process (what Fly runs)
-python -m crawler.load               # landing zone -> raw.* views, then: dbt build --vars '{players_table: players}'
+python -m crawler.load               # landing zone -> raw.* views, then (in dbt/):
+                                     # dbt build --profiles-dir . --vars '{players_table: players, player_match_ids_table: player_match_ids}'
 ```
 
 Control files live in `data/raw/phase1/`:

@@ -27,8 +27,8 @@ Is it tilt, or is it the queue? A Riot API data platform, a pre-registered causa
 - **Phase 1 crawler built, not yet run for real** (see `crawler/README.md`):
   - What it does: stratified sampler, resumable match/timeline crawl to Parquet segments, daily rank snapshots, Q2 collection, a supervisor process for Fly.io (`Dockerfile`, `fly.toml`), and a loader exposing Parquet as `raw.*` views.
   - Testing: 51 tests pass with a mocked API.
+  - Live-tested 2026-11-19 with a dev key in a scratch data dir (8-player sample, 40 documents, snapshots, 2 Q2 matches, load, dbt build on Phase 1 vars): all worked. Sampling's page-count search costs ~570 requests (~10 min) once. dbt on Phase 1 data needs `--vars '{players_table: players, player_match_ids_table: player_match_ids}'`; focal games are restricted to each player's crawled match IDs.
   - Not done yet:
-    - a live burst test with a fresh dev key (`python -m crawler.phase1 fetch --max-docs 20` after a tiny sample);
     - Fly deploy (needs the user's Fly login and the personal key);
     - getting data back from the Fly volume.
   - Infra choice: the crawl and the scheduled jobs share one supervisor process, not GitHub Actions cron, because a Fly volume attaches to one machine and rate limits are per key. Q2 runs every 6 h with an 8 h window, so rank lookups land within 24 h of match end.

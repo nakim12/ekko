@@ -1,4 +1,5 @@
--- Focal player-games with lane-opponent comparisons at the minute mark.
+-- Focal player-games with lane-opponent comparisons at the minute mark. Only matches in the
+-- player's crawled history count (stg_player_match_ids), not Q2 or placebo matches they appear in.
 with participants as (
     select
         *,
@@ -48,6 +49,7 @@ select
     ) as is_afk
 from participants as p
 join {{ ref('stg_players') }} as pl using (puuid)
+join {{ ref('stg_player_match_ids') }} as h using (puuid, match_id)
 join {{ ref('int_matches') }} as m using (match_id)
 left join {{ ref('int_lane_opponents') }} as lo using (match_id, participant_id)
 left join {{ ref('int_participant_minute_mark') }} as f

@@ -16,3 +16,9 @@ sources:
           Focal players and the league-v4 entry they were sampled from. Phase 0 by default; build with
           --vars '{players_table: players}' for the Phase 1 sample (Phase 0 players are excluded
           from confirmatory analysis).
+      - name: player_match_ids
+        identifier: "{{ var('player_match_ids_table', 'phase0_player_match_ids') }}"
+        description: >
+          Each focal player's crawled match IDs (their most recent ranked solo games). Defines which
+          stored matches make up a player's history; Q2 and placebo matches share the store but
+          aren't part of it.

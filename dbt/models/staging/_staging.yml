@@ -40,6 +40,12 @@ models:
           arguments:
             columns: [match_id, frame_index, participant_id]
 
+  - name: stg_player_match_ids
+    data_tests:
+      - unique_combination:
+          arguments:
+            columns: [puuid, match_id]
+
   - name: stg_players
     columns:
       - name: puuid
