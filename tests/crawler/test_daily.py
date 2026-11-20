@@ -77,15 +77,16 @@ async def test_q2_records_ranks_placebo_history_and_statuses(tmp_path):
     assert {r["puuid"]: r["found"] for r in ranks}["x9"] is False
     assert {r["tier"] for r in ranks if r["found"]} == {"GOLD"}  # the solo entry, not flex
 
-    history = read_records(settings.raw_dir, "q2_history")
-    assert [(h["match_id"], h["purpose"], len(h["previous_match_ids"])) for h in history] == [
-        ("NA1_10", "placebo", 5)
-    ]
+    history = {h["purpose"]: h for h in read_records(settings.raw_dir, "q2_history")}
+    assert sorted(history) == ["focal", "placebo"]
+    assert all(
+        h["match_id"] == "NA1_10" and len(h["previous_match_ids"]) == 5 for h in history.values()
+    )
     registry = {r["match_id"]: r for r in read_records(settings.raw_dir, "q2_matches")}
-    assert registry["NA1_10"]["focal_puuid"] == "p1"
-    assert registry["NA1_10"]["placebo_puuid"] == history[0]["puuid"] != "p1"
+    assert registry["NA1_10"]["focal_puuid"] == history["focal"]["puuid"] == "p1"
+    assert registry["NA1_10"]["placebo_puuid"] == history["placebo"]["puuid"] != "p1"
     stored = stored_ids(settings.raw_dir, "matches")
-    assert {"NA1_10", *history[0]["previous_match_ids"]} <= stored
+    assert {"NA1_10", *history["placebo"]["previous_match_ids"]} <= stored
 
     # A second run skips everything already registered.
     calls = respx.calls.call_count

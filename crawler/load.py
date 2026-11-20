@@ -3,8 +3,8 @@
     python -m crawler.load
 
 Views read the Parquet segments in place (absolute paths), so new segments show up without
-reloading. The dbt sources read these names. Build on the Phase 1 sample (instead of Phase 0) with
---vars '{players_table: players, player_match_ids_table: player_match_ids}'.
+reloading. The dbt sources read these names. Build on the Phase 1 sample (instead of Phase 0), with
+the Q2 models enabled, using --vars '{phase: 1}'.
 
 Documents are never stored twice (every writer checks what's stored first), so the views don't
 deduplicate; dbt's unique tests on match_id catch it if that ever breaks.

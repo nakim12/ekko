@@ -16,12 +16,25 @@ vars:
   remake_seconds: 300
   afk_xp_at_14: 1500
   minute_mark: 14
+  # Q2 (section 4.4): LP removed from winners / added to losers for the matched game, and the
+  # minimum ranked players per side for a strength gap.
+  match_lp_adjustment: 20
+  min_ranked_allies: 3
+  min_ranked_enemies: 4
+  autofill_main_role_share: 0.6
+  autofill_history_games: 20
 
 models:
   ekko:
     staging:
       +materialized: view
+      q2:
+        +enabled: "{{ var('phase', 0) | int == 1 }}"
     intermediate:
       +materialized: table
+      q2:
+        +enabled: "{{ var('phase', 0) | int == 1 }}"
     marts:
       +materialized: table
+      q2:
+        +enabled: "{{ var('phase', 0) | int == 1 }}"

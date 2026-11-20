@@ -28,3 +28,21 @@ def load_player_games(path: Path | None = None) -> pd.DataFrame:
     """fct_player_games joined with match start time and day of week."""
     with duckdb.connect(str(path or warehouse_path()), read_only=True) as con:
         return con.sql(PLAYER_GAMES_SQL).df()
+
+
+TEAM_STRENGTH_SQL = """
+select *
+from main.fct_match_team_strength
+where perspective = ?
+"""
+
+
+def load_team_strength(perspective: str = "focal", path: Path | None = None) -> pd.DataFrame:
+    """fct_match_team_strength for one perspective: "focal" (H2, H2a) or "placebo".
+
+    The H2 functions in q2.py take this frame as is (player_key is the perspective player).
+    """
+    if perspective not in ("focal", "placebo"):
+        raise ValueError("perspective must be 'focal' or 'placebo'")
+    with duckdb.connect(str(path or warehouse_path()), read_only=True) as con:
+        return con.execute(TEAM_STRENGTH_SQL, [perspective]).df()

@@ -1,0 +1,33 @@
+version: 2
+
+models:
+  - name: fct_match_team_strength
+    description: >
+      One row per qualified Q2 match per perspective (focal, placebo). strength_gap is the mean
+      ladder position of teammates minus enemies at match time (LP), null when fewer than 3
+      teammates or 4 enemies are ranked. Definitions: analysis/PREREGISTRATION.md 4.4 and 7.
+    data_tests:
+      - unique_combination:
+          arguments:
+            columns: [match_key, perspective]
+    columns:
+      - name: perspective
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [focal, placebo]
+      - name: player_key
+        data_tests: [not_null]
+      - name: streak_state
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [L3+, L2, streak_1, W2, W3+]
+      - name: lookup_delay_hours
+        data_tests: [not_null]
+
+  - name: dim_rank_snapshot
+    data_tests:
+      - unique_combination:
+          arguments:
+            columns: [player_key, snapshot_date]

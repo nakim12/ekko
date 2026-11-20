@@ -5,8 +5,9 @@
 
 Q2 (PREREGISTRATION.md 4.4 and 7.1): for focal players' matches that ended recently, look up the
 current solo rank of all 10 participants within 24 hours of the match ending, until 10,000 matches
-qualify. Per match, a random non-focal participant's previous 5 ranked games are fetched for the
-placebo, and a random ~10% of matches also get every non-focal participant's previous 20 games
+qualify. Per match, the focal player's previous 5 ranked games are fetched (their streak state;
+games after the main crawl aren't otherwise stored), as are a random non-focal participant's (the
+placebo), and a random ~10% of matches also get every non-focal participant's previous 20 games
 (H2a, likely-autofilled roles). Choices are seeded by match ID, so they're reproducible.
 
 The rank-lookup rate limit (~50 per minute on the platform host) makes a run take hours, so q2
@@ -32,7 +33,7 @@ from crawler.store import RecordWriter, SegmentWriter, read_jsonl, read_records,
 
 Q2_TARGET = 10_000
 LOOKUP_DEADLINE = timedelta(hours=24)
-PLACEBO_GAMES = 5
+STREAK_GAMES = 5  # enough to classify L3+ through W3+ even with a remake
 AUTOFILL_GAMES = 20
 AUTOFILL_RATE = 0.10
 
@@ -65,7 +66,7 @@ Q2_HISTORY_SCHEMA = pa.schema(
     [
         ("match_id", pa.string()),
         ("puuid", pa.string()),
-        ("purpose", pa.string()),  # placebo | autofill
+        ("purpose", pa.string()),  # focal | placebo | autofill
         ("previous_match_ids", pa.list_(pa.string())),
     ]
 )
@@ -229,7 +230,8 @@ class Q2Collector:
             return self._register(match_id, "too_old", **fields)
 
         start_ms = info["gameStartTimestamp"]
-        await self._history(match_id, placebo, start_ms, PLACEBO_GAMES, "placebo")
+        await self._history(match_id, focal, start_ms, STREAK_GAMES, "focal")
+        await self._history(match_id, placebo, start_ms, STREAK_GAMES, "placebo")
         if autofill:
             for puuid in others:
                 await self._history(match_id, puuid, start_ms, AUTOFILL_GAMES, "autofill")
@@ -293,13 +295,16 @@ def main(argv: list[str] | None = None) -> int:
     q.add_argument("--window-hours", type=float, default=8.0)
     q.add_argument("--max-matches", type=int, default=400)
     q.add_argument("--seed", type=int, default=20261119)
+    q.add_argument("--autofill-rate", type=float, default=AUTOFILL_RATE)
     args = parser.parse_args(argv)
     settings = load_settings()
     try:
         if args.command == "snapshots":
             asyncio.run(snapshots(settings))
         else:
-            asyncio.run(q2(settings, args.window_hours, args.max_matches, args.seed))
+            asyncio.run(
+                q2(settings, args.window_hours, args.max_matches, args.seed, args.autofill_rate)
+            )
     except RiotAPIError as e:
         log(f"stopped: {e}")
         return 2

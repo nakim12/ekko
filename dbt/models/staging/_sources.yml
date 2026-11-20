@@ -11,14 +11,28 @@ sources:
       - name: timelines
         description: match-v5 timelines, one row per match (`match_id`, `payload` JSON).
       - name: players
-        identifier: "{{ var('players_table', 'phase0_players') }}"
+        identifier: "{{ 'players' if var('phase', 0) | int == 1 else 'phase0_players' }}"
         description: >
-          Focal players and the league-v4 entry they were sampled from. Phase 0 by default; build with
-          --vars '{players_table: players}' for the Phase 1 sample (Phase 0 players are excluded
-          from confirmatory analysis).
+          Focal players and the league-v4 entry they were sampled from: Phase 0 by default, the
+          Phase 1 sample with --vars '{phase: 1}' (Phase 0 players are excluded from confirmatory
+          analysis).
       - name: player_match_ids
-        identifier: "{{ var('player_match_ids_table', 'phase0_player_match_ids') }}"
+        identifier: "{{ 'player_match_ids' if var('phase', 0) | int == 1 else 'phase0_player_match_ids' }}"
         description: >
           Each focal player's crawled match IDs (their most recent ranked solo games). Defines which
           stored matches make up a player's history; Q2 and placebo matches share the store but
           aren't part of it.
+      # Phase 1 only (written by crawler.daily); the models reading them are enabled with phase: 1.
+      - name: rank_snapshots
+        description: Daily league-v4 solo rank of each focal player.
+        config:
+          loaded_at_field: snapshot_at
+          freshness:
+            warn_after: {count: 30, period: hour}
+            error_after: {count: 54, period: hour}
+      - name: q2_matches
+        description: Q2 registry, one row per processed match with its status and seeded choices.
+      - name: q2_ranks
+        description: Current solo rank of all 10 participants of each Q2 match, looked up after it ended.
+      - name: q2_history
+        description: Previous ranked match IDs of the focal player, the placebo player and (autofill sample) every non-focal player.
