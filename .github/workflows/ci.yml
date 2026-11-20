@@ -12,23 +12,29 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: "3.13"
           cache: pip
-      - run: pip install -e ".[crawler,dev]"
+      - run: pip install -e ".[crawler,analysis,dbt,dev]"
       - run: ruff check .
-      - run: pytest
+      - run: ruff format --check .
+      - run: pytest -q
 
   dbt:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: dbt
+    env:
+      EKKO_DUCKDB_PATH: ${{ github.workspace }}/ci.duckdb
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: "3.13"
           cache: pip
-      - run: pip install dbt-duckdb
-      # Switch to `dbt build` once models and seed data exist (Phase 2).
-      - run: dbt parse --profiles-dir .
+      - run: pip install -e ".[crawler,dbt]"
+      # Real Riot data never goes into git; build on a synthetic warehouse of the same shape.
+      - run: python -m tests.fixtures.synthetic_warehouse "$EKKO_DUCKDB_PATH"
+      - name: dbt build (Phase 0 sources)
+        working-directory: dbt
+        run: dbt build --profiles-dir .
+      - name: dbt build (Phase 1 sources, Q2 models)
+        working-directory: dbt
+        run: dbt build --profiles-dir . --vars '{phase: 1}'
