@@ -37,4 +37,5 @@ jobs:
         run: dbt build --profiles-dir .
       - name: dbt build (Phase 1 sources, Q2 models)
         working-directory: dbt
-        run: dbt build --profiles-dir . --vars '{phase: 1}'
+        run: |
+          dbt build --profiles-dir . --vars '{phase: 1}'
