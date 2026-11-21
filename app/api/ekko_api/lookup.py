@@ -12,7 +12,7 @@ import math
 from datetime import UTC, datetime
 from pathlib import Path
 
-from . import features, stats
+from . import coach, features, stats
 from .store import Store
 
 PRIORS_PATH = Path(__file__).with_name("priors.json")
@@ -62,9 +62,12 @@ def ladder_position(entry: dict | None) -> float | None:
 class Lookup:
     """One claimed job."""
 
-    def __init__(self, store: Store, riot, priors: dict, job: dict, token: str) -> None:
+    def __init__(
+        self, store: Store, riot, priors: dict, job: dict, token: str, coach_client=None
+    ) -> None:
         self.store, self.riot, self.priors = store, riot, priors
         self.job, self.token = job, token
+        self.coach_client = coach_client
 
     def progress(self, stage: str, done: int = 0, total: int = 0, message: str | None = None):
         if not self.store.update(
@@ -114,7 +117,12 @@ class Lookup:
         gaps = await self._matchmaking(puuid, ordered[-MATCHMAKING_GAMES:], matches)
 
         self.progress("report")
-        return self._report(account, entry, ordered, gaps)
+        report = self._report(account, entry, ordered, gaps)
+        if self.coach_client is not None:
+            self.progress("coach")
+            result = await asyncio.to_thread(coach.coach, report, self.coach_client)
+            report["coach"] = {**result.output.model_dump(), "source": result.source}
+        return report
 
     async def _matchmaking(
         self, puuid: str, recent: list[features.Game], matches: dict
@@ -179,8 +187,10 @@ class Lookup:
         }
 
 
-async def process(store: Store, riot, priors: dict, job: dict, token: str) -> None:
-    lookup = Lookup(store, riot, priors, job, token)
+async def process(
+    store: Store, riot, priors: dict, job: dict, token: str, coach_client=None
+) -> None:
+    lookup = Lookup(store, riot, priors, job, token, coach_client)
     try:
         report = await lookup.run()
         report_id = store.save_report(job["display_riot_id"], report)
@@ -199,10 +209,12 @@ async def process(store: Store, riot, priors: dict, job: dict, token: str) -> No
         )
 
 
-async def worker_loop(store: Store, riot, priors: dict, poll_seconds: float = 0.5) -> None:
+async def worker_loop(
+    store: Store, riot, priors: dict, poll_seconds: float = 0.5, coach_client=None
+) -> None:
     while True:
         claimed = store.claim()
         if claimed is None:
             await asyncio.sleep(poll_seconds)
             continue
-        await process(store, riot, priors, *claimed)
+        await process(store, riot, priors, *claimed, coach_client=coach_client)

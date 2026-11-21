@@ -27,6 +27,8 @@ export default function ReportView({ report }: { report: Report }) {
         </p>
       )}
 
+      {report.coach && <Coach coach={report.coach} />}
+
       <History history={report.history} />
 
       <div className={styles.cards}>
@@ -228,6 +230,34 @@ function Matchmaking({ report }: { report: Report }) {
         {m.caveat} <a href="/#questions">See the study</a>.
       </p>
     </Card>
+  );
+}
+
+function Coach({ coach }: { coach: NonNullable<Report["coach"]> }) {
+  return (
+    <section className={styles.coach}>
+      <div className={styles.eyebrow}>The short version</div>
+      <p className={styles.coachSummary}>{coach.summary}</p>
+      <ul className={styles.coachList}>
+        {coach.findings.map((f) => (
+          <li key={f.text}>{f.text}</li>
+        ))}
+      </ul>
+      {coach.recommendations.length > 0 && (
+        <div className={styles.coachRecs}>
+          {coach.recommendations.map((r) => (
+            <p key={r.text}>
+              <span className={styles.coachArrow} aria-hidden="true">→</span> {r.text}
+            </p>
+          ))}
+        </div>
+      )}
+      <p className={styles.small}>
+        {coach.source === "model"
+          ? "Written by Claude from your numbers, then checked: every number matches your report, and nothing is claimed that the data doesn't support."
+          : "A standard summary of your numbers."}
+      </p>
+    </section>
   );
 }
 

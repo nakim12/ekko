@@ -30,6 +30,17 @@ uvicorn ekko_api.main:default_app --factory --reload --port 8000   # uses RIOT_A
 - **Priors** (`priors.json`) are **placeholders**: neutral tier averages, and gold norms from the Phase 0 field check. Replace them with values exported from the Phase 1 results; computing them from Phase 0 would be outcome analysis on excluded data. Reports say so (`priors_are_placeholders`).
 - **Privacy:** reports are addressed by a random ID and only describe the Riot ID entered. PUUIDs never appear in responses.
 
+- **Coach** (`coach.py`, PROJECT_PLAN.md section 9): Claude Opus 5.5 writes a short note from a fact sheet. The fact sheet holds the report's numbers, rounded as shown, plus `supported` flags; the model never sees match data. The call uses structured output (`beta.messages.parse` with a Pydantic schema) and server-side refusal fallbacks (`fallbacks="default"`).
+  - **Verification** runs on every note:
+    - numbers must match facts;
+    - cited facts must exist;
+    - no effect may be claimed for an unsupported block;
+    - recommendations come only from approved actions with supported evidence;
+    - no claims about the matchmaker.
+  - **Failure path:** one regeneration with the violations listed, then a deterministic template, which provably passes verification. Reports say which the reader got (`coach.source`).
+  - The coach runs only when `ANTHROPIC_API_KEY` is set.
+- **Coach evaluation** (`coach_eval.py`): 50 synthetic edge-case profiles, scored with and without the verification layer (numeric accuracy, unsupported-claim rate, coverage, template rate). `python -m ekko_api.coach_eval --yes`, about 100–150 model calls. Real profiles and the LLM-judge pass come with Phase 1 data.
+
 Public use needs a Riot production key. Local development works with a dev key.
 
 ## web (Next.js 16 + TypeScript)

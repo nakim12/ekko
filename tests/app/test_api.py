@@ -52,3 +52,27 @@ def test_unknown_riot_id_fails_cleanly(tmp_path):
         assert events[-1]["status"] == "failed"
         assert "No Riot account" in events[-1]["message"]
         assert client.get("/api/reports/doesnotexist").status_code == 404
+
+
+def test_report_includes_the_checked_coach_note(tmp_path):
+    from .test_coach import GOOD, FakeClient
+
+    store = Store(tmp_path / "app.sqlite")
+    app = create_app(
+        store,
+        FakeRiot(n_games=30),
+        load_priors(),
+        workers=1,
+        poll_seconds=0.01,
+        coach_client=FakeClient([GOOD, GOOD]),
+    )
+    with TestClient(app) as client:
+        job = client.post("/api/lookups", json={"riot_id": "Tester#NA1"}).json()
+        events = _events(client, job["id"])
+        report = client.get(f"/api/reports/{events[-1]['report_id']}").json()
+        note = report["coach"]
+        assert note["source"] in (
+            "model",
+            "template",
+        )  # model if GOOD's numbers fit this report's facts
+        assert note["summary"] and 2 <= len(note["findings"]) <= 3

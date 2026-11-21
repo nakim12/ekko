@@ -53,11 +53,21 @@ def _public(job: dict) -> dict:
 
 
 def create_app(
-    store: Store, riot, priors: dict, workers: int = WORKERS, poll_seconds: float = 0.5
+    store: Store,
+    riot,
+    priors: dict,
+    workers: int = WORKERS,
+    poll_seconds: float = 0.5,
+    coach_client=None,
 ) -> FastAPI:
+    """`coach_client`: an Anthropic client for the written summary; None leaves it out."""
+
     @asynccontextmanager
     async def lifespan(_: FastAPI):
-        tasks = [asyncio.create_task(worker_loop(store, riot, priors)) for _ in range(workers)]
+        tasks = [
+            asyncio.create_task(worker_loop(store, riot, priors, coach_client=coach_client))
+            for _ in range(workers)
+        ]
         yield
         for t in tasks:
             t.cancel()
@@ -119,7 +129,15 @@ def create_app(
 
 
 def default_app() -> FastAPI:
-    """The real app: Riot key from .env, SQLite at EKKO_APP_DB (default data/app.sqlite)."""
+    """The real app: Riot key from .env, SQLite at EKKO_APP_DB (default data/app.sqlite).
+
+    The coach runs only when ANTHROPIC_API_KEY is set (load_settings reads .env first).
+    """
     settings = load_settings()
     db = os.environ.get("EKKO_APP_DB") or str(settings.data_dir / "app.sqlite")
-    return create_app(Store(db), RiotClient(settings), load_priors())
+    coach_client = None
+    if os.environ.get("ANTHROPIC_API_KEY"):
+        import anthropic
+
+        coach_client = anthropic.Anthropic()
+    return create_app(Store(db), RiotClient(settings), load_priors(), coach_client=coach_client)

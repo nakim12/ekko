@@ -58,6 +58,12 @@ export type Report = {
     supported: boolean;
   };
   history: { start_ms: number; win: boolean; session: boolean; z: number | null }[];
+  coach?: {
+    summary: string;
+    findings: { text: string; fact_ids: string[] }[];
+    recommendations: { action: string; text: string; fact_ids: string[] }[];
+    source: "model" | "template";
+  };
 };
 
 async function json<T>(res: Response): Promise<T> {

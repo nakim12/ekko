@@ -93,6 +93,22 @@
   font-size: 14px;
 }
 
+.coach {
+  margin-top: 32px;
+  padding: clamp(22px, 3vw, 32px);
+  border: 1px solid var(--mist);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(11, 18, 34, 0.9), rgba(5, 8, 15, 0.6));
+}
+.coachSummary { margin: 12px 0 0; font: 400 clamp(22px, 2.4vw, 28px)/1.25 var(--serif); max-width: 46ch; }
+.coachList { margin: 18px 0 0; padding-left: 18px; color: var(--muted); }
+.coachList li + li { margin-top: 6px; }
+.coachRecs { margin-top: 18px; }
+.coachRecs p { margin: 0; color: var(--silver); }
+.coachRecs p + p { margin-top: 6px; }
+.coachArrow { color: var(--gold); }
+.coach .small { margin: 18px 0 0; }
+
 .history { margin-top: 36px; }
 .historyHead { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 20px; align-items: baseline; }
 .pips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 14px; }
