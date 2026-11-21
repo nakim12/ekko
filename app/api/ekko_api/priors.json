@@ -1,0 +1,13 @@
+{
+  "placeholder": true,
+  "note": "Placeholder until the Phase 1 study: tier tilt priors are neutral (mean 0, SD 0.10) and gold norms come from the Phase 0 field check (overall mean 39, SD 1428; docs/phase0-field-check.md). Replace with values exported from the Phase 1 warehouse; computing them from Phase 0 would be outcome analysis on excluded data.",
+  "tilt_by_tier_group": {
+    "iron_silver": {"mean": 0.0, "sd": 0.1, "placeholder": true},
+    "gold_platinum": {"mean": 0.0, "sd": 0.1, "placeholder": true},
+    "emerald_plus": {"mean": 0.0, "sd": 0.1, "placeholder": true}
+  },
+  "gold_norms": {
+    "overall": {"mean": 39.0, "sd": 1428.0},
+    "by_tier_role_patch": {}
+  }
+}

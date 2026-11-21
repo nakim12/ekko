@@ -134,6 +134,16 @@ class RiotClient:
 
     # --- regional routing (americas) ---
 
+    async def account_by_riot_id(self, game_name: str, tag_line: str) -> dict | None:
+        """account-v1: {puuid, gameName, tagLine} for a Riot ID, or None if it doesn't exist."""
+        from urllib.parse import quote
+
+        url = (
+            f"{self._settings.regional_base_url}/riot/account/v1/accounts/by-riot-id/"
+            f"{quote(game_name, safe='')}/{quote(tag_line, safe='')}"
+        )
+        return await self.get(url)
+
     async def ranked_match_ids(
         self,
         puuid: str,

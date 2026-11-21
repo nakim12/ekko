@@ -14,7 +14,7 @@ jobs:
         with:
           python-version: "3.13"
           cache: pip
-      - run: pip install -e ".[crawler,analysis,dbt,dev]"
+      - run: pip install -e ".[crawler,analysis,dbt,app,dev]"
       - run: ruff check .
       - run: ruff format --check .
       - run: pytest -q
@@ -29,7 +29,7 @@ jobs:
         with:
           python-version: "3.13"
           cache: pip
-      - run: pip install -e ".[crawler,dbt]"
+      - run: pip install -e ".[crawler,dbt,dev]"
       # Real Riot data never goes into git; build on a synthetic warehouse of the same shape.
       - run: python -m tests.fixtures.synthetic_warehouse "$EKKO_DUCKDB_PATH"
       - name: dbt build (Phase 0 sources)
@@ -39,3 +39,7 @@ jobs:
         working-directory: dbt
         run: |
           dbt build --profiles-dir . --vars '{phase: 1}'
+      - name: app features match dbt, game by game
+        env:
+          EKKO_DBT_PARITY_DB: ${{ github.workspace }}/ci.duckdb
+        run: pytest -q tests/app/test_dbt_parity.py
