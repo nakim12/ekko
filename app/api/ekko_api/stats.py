@@ -80,6 +80,7 @@ def tilt(games: list[Game], prior: dict, gold_sd: float) -> dict:
     out = {
         "games_used": 0,
         "tier_average": prior["mean"],
+        "gold_per_sd": gold_sd,
         "prior_is_placeholder": prior.get("placeholder", False),
         "raw": None,
         "shrunk": None,

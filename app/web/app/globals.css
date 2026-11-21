@@ -1,0 +1,31 @@
+/* Site identity (docs/DESIGN.md): a drop on still water at night. */
+:root {
+  color-scheme: dark;
+  --ink: #05080f;
+  --night: #0b1222;
+  --mist: #1b2538;
+  --silver: #dce4ef;
+  --muted: #8a96a8;
+  --faint: #5d6a7e;
+  --gold: #e3c58f;
+  --gutter: clamp(16px, 6vw, 96px);
+  --serif: var(--font-serif), "Instrument Serif", serif;
+  --sans: var(--font-sans), Inter, system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html { background: var(--ink); }
+body {
+  margin: 0;
+  background: var(--ink);
+  color: var(--silver);
+  font: 15px/1.6 var(--sans);
+  overflow-x: hidden;
+}
+a { color: inherit; }
+em { font-style: italic; }
+button, input { font: inherit; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

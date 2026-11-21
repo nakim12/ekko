@@ -32,6 +32,16 @@ uvicorn ekko_api.main:default_app --factory --reload --port 8000   # uses RIOT_A
 
 Public use needs a Riot production key. Local development works with a dev key.
 
-## web
+## web (Next.js 16 + TypeScript)
 
-Next.js + TypeScript (next).
+```bash
+cd app/web && npm install && npm run dev      # http://localhost:3000, API proxied from :8000
+```
+
+- **`/`:** the approved landing page, served byte for byte from `public/index.html` by a `beforeFiles` rewrite.
+- **`/report`:** the lookup and report. `?r=<report id>` opens a report directly, so reports can be shared by link.
+- **`/api/*`:** proxied to the FastAPI backend (`EKKO_API_URL`, default `http://localhost:8000`), so the browser only talks to its own origin, server-sent events included.
+- **Styling:** plain CSS with the site's tokens (`app/globals.css`) and Instrument Serif and Inter via `next/font`. Gold marks only findings with `supported: true`.
+- **Next 16 note:** read `AGENTS.md` and `node_modules/next/dist/docs/` before changing framework-level code. Some APIs differ from older Next versions.
+
+CI runs eslint, `next build` and `tsc`.
